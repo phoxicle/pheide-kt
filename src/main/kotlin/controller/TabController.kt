@@ -1,0 +1,17 @@
+package com.pheide.controllers
+
+class TabController : BaseController() {
+
+    override fun doAction(action: String?, params: Map<String, String?>, isAuthenticated: Boolean ): String? {
+        when (action?.lowercase()) {
+            "show" -> return show(action, params, isAuthenticated)
+            else -> return null
+        }
+    }
+
+    fun show(action: String, params: Map<String, String?>, isAuthenticated: Boolean): String {
+        return "Tab action: $action, Params: $params"
+    }
+
+
+}

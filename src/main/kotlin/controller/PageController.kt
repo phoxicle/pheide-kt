@@ -11,6 +11,8 @@ class PageController : BaseController() {
     }
 
     fun show(action: String, params: Map<String, String?>, isAuthenticated: Boolean): String {
-        return "Action: $action, Params: $params"
+        // TODO get the default tab from DB
+
+        return TabController().show(action, params, isAuthenticated)
     }
 }
