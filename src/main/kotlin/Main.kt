@@ -3,13 +3,17 @@ package com.pheide
 import com.pheide.controllers.ControllerFactory
 import io.ktor.http.*
 import io.ktor.server.engine.*
+import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.io.File
 
 fun main() {
     embeddedServer(Netty, port = 8080) {
         routing {
+            staticFiles("/resources", File("public/static"))
+
             get("/") {
                 // TODO look at proper routing
                 var controllerName = call.request.queryParameters["controller"]
