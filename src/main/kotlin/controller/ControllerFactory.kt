@@ -1,4 +1,4 @@
-package com.pheide.controllers
+package com.pheide.controller
 
 // TODO more modern kt approach?
 class ControllerFactory {

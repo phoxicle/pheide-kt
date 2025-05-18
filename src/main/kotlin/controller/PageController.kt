@@ -1,4 +1,4 @@
-package com.pheide.controllers
+package com.pheide.controller
 
 class PageController : BaseController() {
 

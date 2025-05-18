@@ -1,4 +1,4 @@
-package com.pheide.controllers
+package com.pheide.controller
 
 import com.pheide.view.Renderer
 

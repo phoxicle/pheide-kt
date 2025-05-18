@@ -1,6 +1,6 @@
 package com.pheide
 
-import com.pheide.controllers.ControllerFactory
+import com.pheide.controller.ControllerFactory
 import io.ktor.http.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*

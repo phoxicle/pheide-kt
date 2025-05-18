@@ -1,4 +1,4 @@
-package com.pheide.controllers
+package com.pheide.controller
 
 abstract class BaseController {
 
