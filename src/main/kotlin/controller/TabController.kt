@@ -1,5 +1,7 @@
 package com.pheide.controllers
 
+import com.pheide.view.Renderer
+
 class TabController : BaseController() {
 
     override fun doAction(action: String?, params: Map<String, String?>, isAuthenticated: Boolean ): String? {
@@ -10,7 +12,14 @@ class TabController : BaseController() {
     }
 
     fun show(action: String, params: Map<String, String?>, isAuthenticated: Boolean): String {
-        return "Tab action: $action, Params: $params"
+//        return "Tab action: $action, Params: $params"
+        val renderer = Renderer()
+        val templateVars = mapOf(
+            "content" to "hiiii"
+        )
+
+        return renderer.renderPage("tab/show.html", templateVars)
+
     }
 
 

@@ -39,7 +39,8 @@ fun main() {
                 val responseText = controller?.doAction(action, params, isAuthenticated = false)
                     ?: "Controller or action not found"
 
-                call.respondText(responseText, ContentType.Text.Plain)
+//                call.respondText(responseText, ContentType.Text.Plain)
+                call.respondText(responseText, ContentType.Text.Html)
             }
         }
     }.start(wait = true)
