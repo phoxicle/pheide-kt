@@ -1,15 +1,24 @@
 package com.pheide
 
 import com.pheide.controller.ControllerFactory
+import com.pheide.repository.DAL
+import com.pheide.repository.PageTable
+import com.pheide.repository.TabTable
 import io.ktor.http.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 
 fun main() {
+    // Initialize the database connection
+    DAL.connect()
+    DAL.createSchemaAndPopulateData()
+
     embeddedServer(Netty, port = 8080) {
         routing {
             staticFiles("/resources", File("public/static"))
@@ -40,12 +49,35 @@ fun main() {
                 // Simulate calling a controller's action
                 val factory = ControllerFactory()
                 val controller = factory.get(controllerName)
-                val responseText = controller?.doAction(action, params, isAuthenticated = false)
-                    ?: "Controller or action not found"
+//                val responseText = controller?.doAction(action, params, isAuthenticated = false)
+//                    ?: "Controller or action not found"
 
-//                call.respondText(responseText, ContentType.Text.Plain)
+                // Example database interaction
+                val pages = transaction {
+                    PageTable.selectAll().map {
+                        "Page: ${it[PageTable.title]}, Default: ${it[PageTable.isDefault]}"
+                    }
+                }
+
+                val tabs = transaction {
+                    TabTable.selectAll().map {
+                        "Tab: ${it[TabTable.title]} (${it[TabTable.pageId]}), Content: ${it[TabTable.content]}"
+                    }
+                }
+
+                val responseText = """
+                    <h1>Pages</h1>
+                    <ul>${pages.joinToString("") { "<li>$it</li>" }}</ul>
+                    <h1>Tabs</h1>
+                    <ul>${tabs.joinToString("") { "<li>$it</li>" }}</ul>
+                """.trimIndent()
+                // end DB example
+
                 call.respondText(responseText, ContentType.Text.Html)
             }
         }
     }.start(wait = true)
 }
+
+
+
