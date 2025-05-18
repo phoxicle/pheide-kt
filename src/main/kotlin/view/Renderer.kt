@@ -5,13 +5,22 @@ class Renderer {
 
     fun renderPage(templateName: String, templateVars: Map<String, String>): String {
         val body = readFile(templateName)
-
         val header = readFile("header.html")
         val footer = readFile("footer.html")
-        val content = header + body + footer
+
+        var content = header + body + footer
+
+        content = replaceTemplateVars(content, templateVars)
 
         return content
+    }
 
+    private fun replaceTemplateVars(content: String, templateVars: Map<String, String>): String {
+        var result = content
+        for ((key, value) in templateVars) {
+            result = result.replace("%%%$key%%%", value)
+        }
+        return result
     }
 
     private fun readFile(templateName: String): String {
