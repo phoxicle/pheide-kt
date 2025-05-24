@@ -6,13 +6,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 class TabRepository {
 
-    fun selectAll(): List<Tab> {
-        return transaction {
-            TabTable.selectAll()
-                .map { Tab(it) }
-        }
-    }
-
     fun selectById(id: Int): Tab? {
         return transaction {
             TabTable.selectAll()
@@ -22,14 +15,22 @@ class TabRepository {
         }
     }
 
-    fun selectByPageId(pageId: Int): Tab? {
+    fun selectDefault(pageId: Int): Tab? {
         return transaction {
-            // TODO Check if this actually limits to 1
             TabTable.selectAll()
                 .where { TabTable.pageId eq pageId }
                 .orderBy(TabTable.sorting)
                 .map { Tab(it) }
                 .firstOrNull()
+        }
+    }
+
+    fun selectAllByPageId(pageId: Int): List<Tab> {
+        return transaction {
+            TabTable.selectAll()
+                .where { TabTable.pageId eq pageId }
+                .orderBy(TabTable.sorting)
+                .map { Tab(it) }
         }
     }
 }

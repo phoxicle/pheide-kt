@@ -25,7 +25,7 @@ class TabController : BaseController() {
         // Retrieve Tab
         val tabRepository = TabRepository()
         val tab = if (tabId == null) {
-            tabRepository.selectByPageId(page.id)
+            tabRepository.selectDefault(page.id)
         } else {
             tabRepository.selectById(tabId)
         } ?: throw NoSuchElementException("Tab with id $tabId not found")
@@ -47,15 +47,27 @@ class TabController : BaseController() {
         val headerImagesHtml = PageRepository()
             .selectAll()
             .joinToString("") { page ->
-                val headerImageView = View()
-                headerImageView.vars["css_id"] = page.headerCssId
-                headerImageView.vars["title"] = page.title
+                val v = View()
+                v.vars["css_id"] = page.headerCssId
+                v.vars["title"] = page.title
                 // TODO link builder
-                headerImageView.vars["link"] = "/?controller=page&action=show&page_id=${page.id}"
-                headerImageView.render("header_image.html")
+                v.vars["link"] = "/?controller=page&action=show&page_id=${page.id}"
+                v.render("header_image.html")
             }
         view.vars["header_images"] = headerImagesHtml
 
+        // Tab bar vars
+        val tabBarHtml = TabRepository()
+            .selectAllByPageId(page.id)
+            .joinToString("") { tab ->
+                val v = View()
+                v.vars["tab_class"] = if (tab.id == tabId) "activeTab" else ""
+                v.vars["tab_title"] = tab.title
+                // TODO link builder
+                v.vars["tab_link"] = "/?controller=tab&action=show&page_id=${page.id}&tab_id=${tab.id}"
+                v.render("tab.html")
+            }
+        view.vars["tab_bar"] = tabBarHtml
 
         return view.renderPage("tab/show.html")
     }
