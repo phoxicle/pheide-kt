@@ -18,6 +18,7 @@ fun main() {
     // Initialize the database connection
     // TODO check location
     DAL.connect()
+    DAL.clearTestData()
     DAL.createSchemaAndPopulateData()
 
     embeddedServer(Netty, port = 8080) {

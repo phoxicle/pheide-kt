@@ -3,6 +3,7 @@ package com.pheide.repository
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
@@ -18,7 +19,15 @@ object DAL {
         Database.connect("jdbc:sqlite:data.db", driver = "org.sqlite.JDBC")
     }
 
-    // Define schema and populate data
+    fun clearTestData() {
+        logger.info("Clearing test data")
+        transaction {
+            TabTable.deleteAll()
+            PageTable.deleteAll()
+        }
+    }
+
+    // Define schema and populate test data
     fun createSchemaAndPopulateData() {
         logger.info("Creating schema")
         transaction {
@@ -27,18 +36,42 @@ object DAL {
             // Populate test data
             if (PageTable.selectAll().empty()) {
                 logger.info("Populating test data")
-                val insertedPageId = PageTable.insertAndGetId {
+                val milkPageId = PageTable.insertAndGetId {
                     it[title] = "Home"
                     it[headerCssId] = "milk"
                     it[isDefault] = true
                 }
 
                 TabTable.insert {
-                    it[pageId] = insertedPageId.value
-                    it[title] = "Home"
-                    it[aside] = "Aside content"
-                    it[content] = "Main content"
+                    it[pageId] = milkPageId.value
+                    it[title] = "Home tab 1"
+                    it[aside] = "Aside content 1"
+                    it[content] = "Main content 1"
                     it[sorting] = 1
+                    it[type] = "text"
+                }
+
+                TabTable.insert {
+                    it[pageId] = milkPageId.value
+                    it[title] = "Home tab 2"
+                    it[aside] = "Aside content 2"
+                    it[content] = "Main content 2"
+                    it[sorting] = 10
+                    it[type] = "text"
+                }
+
+                val millPageId = PageTable.insertAndGetId {
+                    it[title] = "Hobby"
+                    it[headerCssId] = "mill"
+                    it[isDefault] = true
+                }
+
+                TabTable.insert {
+                    it[pageId] = millPageId.value
+                    it[title] = "Hobby tab 1"
+                    it[aside] = "mill tab aside 1"
+                    it[content] = "mill tab content 1"
+                    it[sorting] = 5
                     it[type] = "text"
                 }
             }

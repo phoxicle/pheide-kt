@@ -1,7 +1,7 @@
 package com.pheide.controller
 
-import com.pheide.repository.Page
 import com.pheide.repository.PageRepository
+import com.pheide.view.View
 
 class PageController : BaseController() {
 

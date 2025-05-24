@@ -1,6 +1,13 @@
 package com.pheide.view
 
+import org.slf4j.LoggerFactory
+
 class View(val vars: MutableMap<String, String> = mutableMapOf()) {
+    private val logger = LoggerFactory.getLogger(View::class.java)
+
+    fun render(templateName: String): String {
+        return replaceTemplateVars(readFile(templateName), vars)
+    }
 
     fun renderPage(templateName: String): String {
         val body = readFile(templateName)
@@ -15,6 +22,7 @@ class View(val vars: MutableMap<String, String> = mutableMapOf()) {
     private fun replaceTemplateVars(content: String, templateVars: Map<String, String>): String {
         var result = content
         for ((key, value) in templateVars) {
+            logger.debug("Replacing template variable: $key: $value")
             result = result.replace("%%%$key%%%", value)
         }
         return result
@@ -22,6 +30,7 @@ class View(val vars: MutableMap<String, String> = mutableMapOf()) {
 
     private fun readFile(templateName: String): String {
         // Use View::class.java to get the class loader
+        logger.debug("Reading template file: $templateName")
         val resourceStream = View::class.java.classLoader.getResourceAsStream("templates/$templateName")
             ?: throw Exception("Template file not found: $templateName")
 
