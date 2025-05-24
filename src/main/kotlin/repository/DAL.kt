@@ -55,7 +55,6 @@ object PageTable : IntIdTable("page") {
 
 object TabTable : IntIdTable("tab") {
     val pageId = integer("page_id").references(PageTable.id)
-//            "reference("id", PageTable)
     val title = varchar("title", 255)
     val aside = text("aside")
     val content = text("content")

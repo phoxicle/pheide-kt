@@ -16,6 +16,7 @@ import java.io.File
 
 fun main() {
     // Initialize the database connection
+    // TODO check location
     DAL.connect()
     DAL.createSchemaAndPopulateData()
 
@@ -49,29 +50,8 @@ fun main() {
                 // Simulate calling a controller's action
                 val factory = ControllerFactory()
                 val controller = factory.get(controllerName)
-//                val responseText = controller?.doAction(action, params, isAuthenticated = false)
-//                    ?: "Controller or action not found"
-
-                // Example database interaction
-                val pages = transaction {
-                    PageTable.selectAll().map {
-                        "Page: ${it[PageTable.title]}, Default: ${it[PageTable.isDefault]}"
-                    }
-                }
-
-                val tabs = transaction {
-                    TabTable.selectAll().map {
-                        "Tab: ${it[TabTable.title]} (${it[TabTable.pageId]}), Content: ${it[TabTable.content]}"
-                    }
-                }
-
-                val responseText = """
-                    <h1>Pages</h1>
-                    <ul>${pages.joinToString("") { "<li>$it</li>" }}</ul>
-                    <h1>Tabs</h1>
-                    <ul>${tabs.joinToString("") { "<li>$it</li>" }}</ul>
-                """.trimIndent()
-                // end DB example
+                val responseText = controller?.doAction(action, params)
+                    ?: "Controller or action not found"
 
                 call.respondText(responseText, ContentType.Text.Html)
             }

@@ -1,18 +1,26 @@
 package com.pheide.controller
 
+import com.pheide.repository.Page
+import com.pheide.repository.PageRepository
+
 class PageController : BaseController() {
 
     // TODO get rid of nullables
-    override fun doAction(action: String?, params: Map<String, String?>, isAuthenticated: Boolean): String? {
+    override fun doAction(action: String?, params: Map<String, String?>): String? {
         return when (action?.lowercase()) {
-            "show" -> show(action, params, isAuthenticated)
+            "show" -> show(params["page_id"]?.toIntOrNull())
             else -> null
         }
     }
 
-    fun show(action: String, params: Map<String, String?>, isAuthenticated: Boolean): String {
-        // TODO get the default tab from DB
+    fun show(pageId: Int? = null): String {
+        val pageRepository = PageRepository()
+        val page = if (pageId == null) {
+            pageRepository.selectDefault()
+        } else {
+            pageRepository.selectById(pageId)
+        } ?: throw NoSuchElementException("Page with id $pageId not found")
 
-        return TabController().show(action, params, isAuthenticated)
+        return TabController().show(page)
     }
 }

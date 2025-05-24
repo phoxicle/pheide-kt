@@ -1,17 +1,14 @@
 package com.pheide.view
 
-class Renderer {
+class View(val vars: MutableMap<String, String> = mutableMapOf()) {
 
-
-    fun renderPage(templateName: String, templateVars: Map<String, String>): String {
+    fun renderPage(templateName: String): String {
         val body = readFile(templateName)
         val header = readFile("header.html")
         val footer = readFile("footer.html")
 
         var content = header + body + footer
-
-        content = replaceTemplateVars(content, templateVars)
-
+        content = replaceTemplateVars(content, vars)
         return content
     }
 
@@ -24,12 +21,10 @@ class Renderer {
     }
 
     private fun readFile(templateName: String): String {
-        val filePath = javaClass.classLoader.getResource("templates/$templateName")?.path
-        val file = java.io.File(filePath)
-        if (file.exists()) {
-            return file.readText()
-        } else {
-            throw Exception("File not found: $filePath")
-        }
+        // Use View::class.java to get the class loader
+        val resourceStream = View::class.java.classLoader.getResourceAsStream("templates/$templateName")
+            ?: throw Exception("Template file not found: $templateName")
+
+        return resourceStream.bufferedReader().use { it.readText() }
     }
 }
