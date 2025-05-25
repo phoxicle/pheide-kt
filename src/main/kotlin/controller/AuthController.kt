@@ -18,12 +18,12 @@ class AuthController(private val call: RoutingCall) : BaseController(call) {
     fun login() : String {
         val view = View("auth/login.html")
         view.vars["action_link"] = LinkBuilder.build("auth", "authenticate")
-        // TODO render page
-        return view.render()
+        return renderPage(view, isLoggedIn = false)
     }
 
     fun logout() : String {
         Authenticator.logout(call)
+        // TODO full redirect
         return PageController(call).show(isLoggedIn = false)
     }
 
@@ -45,8 +45,7 @@ class AuthController(private val call: RoutingCall) : BaseController(call) {
 
     fun restricted() : String {
         val view = View("auth/restricted.html")
-        // TODO render page
-        return view.render()
+        return renderPage(view, isLoggedIn = false)
     }
 
 }
