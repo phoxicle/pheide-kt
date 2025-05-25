@@ -28,6 +28,9 @@ open class View(private val templateName: String, val vars: MutableMap<String, S
         for ((key, value) in templateVars) {
             result = result.replace("%%%$key%%%", value)
         }
+
+        // Hide any placeholders not replaced
+        result = result.replace(Regex("%%%[a-zA-Z0-9_]*%%%"), "")
         return result
     }
 
