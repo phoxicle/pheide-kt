@@ -1,8 +1,8 @@
 package com.pheide.controller
 
-import com.pheide.repository.Page
+import com.pheide.controller.Authenticator.isLoggedIn
+import com.pheide.controller.LinkBuilder.link
 import com.pheide.repository.PageRepository
-import com.pheide.repository.Tab
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
 import io.ktor.http.ContentType
@@ -29,14 +29,15 @@ abstract class BaseController(
     }
 
     fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null) : String {
+
         // Login/logout
         view.vars["auth_button"] = if (Authenticator.isLoggedIn(call)) {
             View("auth/partials/logout_button.html",
-                mutableMapOf("action_link" to LinkBuilder.build("auth", "logout")))
+                mutableMapOf("action_link" to LinkBuilder.link("auth", "logout")))
                 .render()
         } else {
             View("auth/partials/login_button.html",
-                mutableMapOf("action_link" to LinkBuilder.build("auth", "login")))
+                mutableMapOf("action_link" to LinkBuilder.link("auth", "login")))
                 .render()
         }
 
@@ -53,7 +54,7 @@ abstract class BaseController(
                 val v = View("header_image.html")
                 v.vars["css_id"] = otherPage.headerCssId
                 v.vars["title"] = otherPage.title
-                v.vars["link"] = LinkBuilder.build("page", "show",mapOf(
+                v.vars["link"] = LinkBuilder.link("page", "show",mapOf(
                     "page_id" to otherPage.id.toString()))
                 v.render()
             }
@@ -64,12 +65,36 @@ abstract class BaseController(
                 .selectAllByPageId(pageId)
                 .joinToString("") { otherTab ->
                     val v = if (otherTab.id == tabId) {
-                        View("tab/partials/active_tab.html")
+                        val deleteButton = View("tab/partials/delete_button.html", mutableMapOf(
+                            "action_link" to link("tab", "delete", mapOf(
+                                "page_id" to pageId.toString(),
+                                "tab_id" to tabId.toString()
+                            ))
+                        )).renderIf(isLoggedIn(call))
+                        val shiftLeftButton = View("tab/partials/shift_left_button.html", mutableMapOf(
+                            "action_link" to link("tab", "shift", mapOf(
+                                "page_id" to pageId.toString(),
+                                "tab_id" to tabId.toString(),
+                                "direction" to "left"
+                            ))
+                        )).renderIf(isLoggedIn(call))
+                        val shiftRightButton = View("tab/partials/shift_right_button.html", mutableMapOf(
+                            "action_link" to link("tab", "shift", mapOf(
+                                "page_id" to pageId.toString(),
+                                "tab_id" to tabId.toString(),
+                                "direction" to "right"
+                            ))
+                        )).renderIf(isLoggedIn(call))
+                        View("tab/partials/active_tab.html", mutableMapOf(
+                            "delete_button" to deleteButton,
+                            "shift_left_button" to shiftLeftButton,
+                            "shift_right_button" to shiftRightButton
+                        ))
                     } else {
                         View("tab/partials/inactive_tab.html")
                     }
                     v.vars["tab_title"] = otherTab.title
-                    v.vars["tab_link"] = LinkBuilder.build(
+                    v.vars["tab_link"] = LinkBuilder.link(
                         "tab", "show", mapOf(
                             "page_id" to pageId.toString(),
                             "tab_id" to otherTab.id.toString()
@@ -81,9 +106,9 @@ abstract class BaseController(
 
         // TODO probably goes inside the above
         // If logged in, add to the tab bar
-        if (pageId != null && Authenticator.isLoggedIn(call)) {
+        if (pageId != null && isLoggedIn(call)) {
             view.vars["plus_tab"] = View("tab/partials/plus_tab.html", mutableMapOf(
-                "action_link" to LinkBuilder.build("tab", "new", mapOf(
+                "action_link" to LinkBuilder.link("tab", "new", mapOf(
                     "page_id" to pageId.toString()
                 ))
             )).render()

@@ -1,12 +1,11 @@
 package com.pheide.controller
 
 import com.pheide.controller.Authenticator.verifyAccess
-import com.pheide.repository.Page
-import com.pheide.repository.PageRepository
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
 import io.ktor.server.application.ApplicationCall
 import org.slf4j.LoggerFactory
+import java.nio.file.Files.delete
 import kotlin.text.toInt
 
 class TabController(
@@ -28,6 +27,7 @@ class TabController(
                 aside = params["aside"])
             "new" -> new(params["page_id"]!!.toInt())
             "create" -> create(params["page_id"]!!.toInt(), params["title"]!!)
+            "delete" -> delete(params["page_id"]!!.toInt(), params["tab_id"]!!.toInt())
             else -> null
         }
     }
@@ -49,7 +49,7 @@ class TabController(
         // If logged in, allow editing of content and aside
         if (Authenticator.isLoggedIn(call)) {
             val varsForEditing = mutableMapOf(
-                "update_action" to LinkBuilder.build("tab", "update"),
+                "update_action" to LinkBuilder.link("tab", "update"),
                 "page_id" to pageId.toString(),
                 "tab_id" to tab.id.toString(),
                 "content" to tab.content,
@@ -67,7 +67,7 @@ class TabController(
     suspend fun update(pageId: Int, tabId: Int, title: String?, content: String?, aside: String?) {
         verifyAccess(call)
         tabRepository.update(tabId, title, content, aside)
-        redirect(LinkBuilder.build("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
+        redirect(LinkBuilder.link("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
     }
 
     suspend fun new(pageId: Int) {
@@ -78,7 +78,7 @@ class TabController(
 
         // TODO hide plus tab
         view.vars["new_tab"] = View("tab/partials/new_tab.html", mutableMapOf(
-            "action_link" to LinkBuilder.build("tab", "create"),
+            "action_link" to LinkBuilder.link("tab", "create"),
             "page_id" to pageId.toString(),
         )).render()
 
@@ -88,7 +88,12 @@ class TabController(
     suspend fun create(pageId: Int, title: String) {
         verifyAccess(call)
         val tabId = tabRepository.create(pageId, title)
-        redirect(LinkBuilder.build("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
+        redirect(LinkBuilder.link("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
     }
 
+    suspend fun delete(pageId: Int, tabId: Int) {
+        verifyAccess(call)
+        val tabId = tabRepository.delete(tabId)
+        redirect(LinkBuilder.link("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
+    }
 }

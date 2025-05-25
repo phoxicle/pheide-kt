@@ -2,11 +2,15 @@ package com.pheide.view
 
 import org.slf4j.LoggerFactory
 
-class View(private val templateName: String, val vars: MutableMap<String, String> = mutableMapOf()) {
+open class View(private val templateName: String, val vars: MutableMap<String, String> = mutableMapOf()) {
     private val logger = LoggerFactory.getLogger("View")
 
     fun render(additionalVars: Map<String, String> = emptyMap()): String {
         return replaceTemplateVars(readFile(templateName), vars + additionalVars)
+    }
+
+    fun renderIf(condition: Boolean) : String {
+        return if (condition) render() else ""
     }
 
     fun renderPage(additionalVars: Map<String, String> = emptyMap()): String {

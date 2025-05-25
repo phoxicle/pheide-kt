@@ -57,6 +57,14 @@ class TabRepository {
             insertedId.value
         }
     }
+
+    fun delete(tabId: Int) {
+        transaction {
+            TabTable.deleteWhere {
+                TabTable.id eq tabId
+            }
+        }
+    }
 }
 
 data class Tab(

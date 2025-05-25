@@ -2,7 +2,6 @@ package com.pheide.controller
 
 import com.pheide.view.View
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.response.respondRedirect
 import org.slf4j.LoggerFactory
 
 val logger = LoggerFactory.getLogger("AuthController")
@@ -21,14 +20,14 @@ class AuthController(call: ApplicationCall) : BaseController(call) {
 
     suspend fun login() {
         val view = View("auth/login.html")
-        view.vars["action_link"] = LinkBuilder.build("auth", "authenticate")
+        view.vars["action_link"] = LinkBuilder.link("auth", "authenticate")
         respond(renderPage(view))
     }
 
     suspend fun logout() {
         Authenticator.verifyAccess(call)
         Authenticator.logout(call)
-        redirect(LinkBuilder.build("page", "show"))
+        redirect(LinkBuilder.link("page", "show"))
     }
 
     suspend fun authenticate(username: String?, password: String?) {
@@ -40,9 +39,9 @@ class AuthController(call: ApplicationCall) : BaseController(call) {
 
         val success = Authenticator.authenticate(call, username, password)
         return if (success) {
-            redirect(LinkBuilder.build("auth", "success"))
+            redirect(LinkBuilder.link("auth", "success"))
         } else {
-            redirect(LinkBuilder.build("auth", "restricted"))
+            redirect(LinkBuilder.link("auth", "restricted"))
         }
     }
 
