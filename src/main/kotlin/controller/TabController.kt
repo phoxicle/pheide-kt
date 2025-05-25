@@ -17,14 +17,12 @@ class TabController(
     private val logger = LoggerFactory.getLogger("TabController")
 
     override suspend fun doAction(action: String?, params: Map<String, String?>) {
+        // TODO error handling
         when (action?.lowercase()) {
-            "show" -> {
-                // TODO error handling
-                show(params["page_id"]!!.toInt(), params["tab_id"]?.toIntOrNull())
-            }
-            "update" -> {
-                update(params["page_id"]!!.toInt(), params["tab_id"]!!.toInt(), params["content"], params["aside"])
-            }
+            "show" -> show(params["page_id"]!!.toInt(), params["tab_id"]?.toIntOrNull())
+            "update" -> update(params["page_id"]!!.toInt(), params["tab_id"]!!.toInt(), params["content"], params["aside"])
+            "new" -> new(params["page_id"]!!.toInt())
+            "create" -> create(params["page_id"]!!.toInt(), params["title"]!!)
             else -> null
         }
     }
@@ -64,6 +62,27 @@ class TabController(
     suspend fun update(pageId: Int, tabId: Int, content: String?, aside: String?) {
         verifyAccess(call)
         tabRepository.update(tabId, content, aside)
+        redirect(LinkBuilder.build("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
+    }
+
+    suspend fun new(pageId: Int) {
+        verifyAccess(call)
+
+        // Same as tab show, except with a fake, new tab
+        val view = View("tab/show.html")
+
+        // TODO hide plus tab
+        view.vars["new_tab"] = View("tab/new_tab.html", mutableMapOf(
+            "action_link" to LinkBuilder.build("tab", "create"),
+            "page_id" to pageId.toString(),
+        )).render()
+
+        respond(renderPage(view, pageId))
+    }
+
+    suspend fun create(pageId: Int, title: String) {
+        verifyAccess(call)
+        val tabId = tabRepository.create(pageId, title)
         redirect(LinkBuilder.build("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
     }
 

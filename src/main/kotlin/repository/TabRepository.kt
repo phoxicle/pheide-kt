@@ -34,18 +34,27 @@ class TabRepository {
         }
     }
 
-    fun update(tabId: Int, content: String? = null, aside: String? = null) {
+    fun update(tabId: Int, title: String? = null, content: String? = null, aside: String? = null) {
         transaction {
-            if (content != null) {
-                TabTable.update({ TabTable.id eq tabId }) {
-                    it[TabTable.content] = content
-                }
+            TabTable.update({ TabTable.id eq tabId }) {
+                if (content != null) it[TabTable.content] = content
+                if (aside != null) it[TabTable.aside] = aside
+                if (title != null) it[TabTable.title] = title
             }
-            if (aside != null) {
-                TabTable.update({ TabTable.id eq tabId }) {
-                    it[TabTable.aside] = aside
-                }
-            }
+        }
+    }
+
+    fun create(pageId: Int, title: String): Int {
+        return transaction {
+            val insertedId = TabTable.insert {
+                it[TabTable.pageId] = pageId
+                it[TabTable.title] = title
+                it[TabTable.aside] = ""
+                it[TabTable.content] = ""
+                it[TabTable.sorting] = 1 // TODO
+                it[TabTable.type] = "text"
+            } get TabTable.id
+            insertedId.value
         }
     }
 }

@@ -56,6 +56,7 @@ fun main() {
                     "password" to formParameters["password"],
                     "page_id" to formParameters["page_id"],
                     "tab_id" to formParameters["tab_id"],
+                    "title" to formParameters["title"],
                     "content" to formParameters["content"],
                     "aside" to formParameters["aside"],
                 )
