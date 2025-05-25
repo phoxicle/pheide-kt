@@ -1,11 +1,21 @@
 package com.pheide.controller
 
-import com.pheide.view.View
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import io.ktor.server.routing.RoutingCall
 
-abstract class BaseController {
+// TODO sealed interface instead?
+abstract class BaseController(private val call: RoutingCall) {
 
-    abstract fun doAction(action: String?, params: Map<String, String?>): String?
+    abstract fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String?
 
+}
+
+object ControllerFactory {
+    fun get(controllerName: String, call: RoutingCall): BaseController? {
+        return when (controllerName.lowercase()) {
+            "page" -> PageController(call)
+            "tab" -> TabController(call)
+            "auth" -> AuthController(call)
+            else -> null
+        }
+    }
 }

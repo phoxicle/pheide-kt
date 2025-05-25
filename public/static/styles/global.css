@@ -48,15 +48,15 @@ height:16px;
 font-variant: small-caps;
 font-size:0.8em;
 
-                        
+
 }
-                        
+
 ul#cats li a,
 ul#cats li.activeTab{
-text-decoration:none;           
+text-decoration:none;
 padding:3px 10px 0 10px;
 color: #555555;
-background: beige;              
+background: beige;
 border-style: solid solid none solid;
 border-color:grey;
 border-width:1px;
@@ -158,7 +158,7 @@ float:left;
 padding-right:15px;
 }
 
-/* header button styles */ 
+/* header button styles */
 #laptop{
 position:absolute;
 margin-left:269px;
@@ -280,4 +280,13 @@ padding:0 0 10px 10px;
 
 a img {
 border:0;
+}
+
+#auth_button {
+float: right;
+font-size: 8px;
+}
+
+#auth_button a {
+text-decoration: none;
 }

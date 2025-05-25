@@ -4,24 +4,25 @@ import com.pheide.repository.Page
 import com.pheide.repository.PageRepository
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
+import io.ktor.server.routing.RoutingCall
 import org.slf4j.LoggerFactory
 
-class TabController : BaseController() {
+class TabController(private val call: RoutingCall) : BaseController(call) {
 
     private val logger = LoggerFactory.getLogger(TabController::class.java)
 
-    override fun doAction(action: String?, params: Map<String, String?>): String? {
+    override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
         when (action?.lowercase()) {
             "show" -> {
                 val pageId = params["page_id"] ?: return "Page id not set"
                 val page = PageRepository().selectById(pageId.toInt()) ?: return "Page not found"
-                return show(page, params["tab_id"]?.toIntOrNull())
+                return show(page, params["tab_id"]?.toIntOrNull(), isLoggedIn)
             }
             else -> return null
         }
     }
 
-    fun show(page: Page, tabId: Int? = null): String {
+    fun show(page: Page, tabId: Int? = null, isLoggedIn: Boolean): String {
         // Retrieve Tab
         val tabRepository = TabRepository()
         val tab = if (tabId == null) {
@@ -41,7 +42,17 @@ class TabController : BaseController() {
         view.vars["page_css_id"] = page.headerCssId
 
         // Header vars
-        val headerImagesHtml = PageRepository()
+        val authButton = View()
+        if (isLoggedIn) {
+            // TODO move template inside View constructor
+            authButton.vars["action_link"] = "/?controller=auth&action=logout"
+            view.vars["auth_button"] = authButton.render("auth/logout_button.html")
+        } else {
+            authButton.vars["action_link"] = "/?controller=auth&action=login"
+            view.vars["auth_button"] = authButton.render("auth/login_button.html")
+        }
+
+        view.vars["header_images"] = PageRepository()
             .selectAll()
             .joinToString("") { otherPage ->
                 val v = View()
@@ -51,10 +62,9 @@ class TabController : BaseController() {
                 v.vars["link"] = "/?controller=page&action=show&page_id=${otherPage.id}"
                 v.render("header_image.html")
             }
-        view.vars["header_images"] = headerImagesHtml
 
         // Tab bar vars
-        val tabBarHtml = tabRepository
+        view.vars["tab_bar"] = tabRepository
             .selectAllByPageId(page.id)
             .joinToString("") { otherTab ->
                 val v = View()
@@ -62,12 +72,11 @@ class TabController : BaseController() {
                 // TODO link builder
                 v.vars["tab_link"] = "/?controller=tab&action=show&page_id=${page.id}&tab_id=${otherTab.id}"
                 if (otherTab.id == tab.id) {
-                    v.render("active_tab.html")
+                    v.render("tab/active_tab.html")
                 } else {
-                    v.render("inactive_tab.html")
+                    v.render("tab/inactive_tab.html")
                 }
             }
-        view.vars["tab_bar"] = tabBarHtml
 
         return view.renderPage("tab/show.html")
     }

@@ -1,17 +1,14 @@
 package com.pheide
 
+import com.pheide.controller.Authenticator
 import com.pheide.controller.ControllerFactory
 import com.pheide.repository.DAL
-import com.pheide.repository.PageTable
-import com.pheide.repository.TabTable
 import io.ktor.http.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.io.File
 
 fun main() {
@@ -34,7 +31,7 @@ fun main() {
                 val username = call.request.queryParameters["username"]
                 val password = call.request.queryParameters["password"]
 
-
+                val isLoggedIn = Authenticator.isLoggedIn(call)
 
                 // Parameters to pass to controller
                 val params = mapOf(
@@ -51,9 +48,8 @@ fun main() {
                 }
 
                 // Simulate calling a controller's action
-                val factory = ControllerFactory()
-                val controller = factory.get(controllerName)
-                val responseText = controller?.doAction(action, params)
+                val controller = ControllerFactory.get(controllerName, call)
+                val responseText = controller?.doAction(action, params, isLoggedIn)
                     ?: "Controller or action not found"
 
                 call.respondText(responseText, ContentType.Text.Html)
