@@ -62,7 +62,11 @@ class TabController : BaseController() {
                 v.vars["tab_title"] = tab.title
                 // TODO link builder
                 v.vars["tab_link"] = "/?controller=tab&action=show&page_id=${page.id}&tab_id=${tab.id}"
-                v.render("tab.html")
+                if (tab.id == tabId) {
+                    v.render("active_tab.html")
+                } else {
+                    v.render("inactive_tab.html")
+                }
             }
         view.vars["tab_bar"] = tabBarHtml
 
