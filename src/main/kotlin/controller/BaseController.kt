@@ -9,12 +9,15 @@ import io.ktor.http.ContentType
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.response.respondRedirect
 import io.ktor.server.response.respondText
+import org.slf4j.LoggerFactory
 import kotlin.collections.set
 
 abstract class BaseController(
     protected val call: ApplicationCall,
     private val pageRepository: PageRepository = PageRepository(),
     private val tabRepository: TabRepository = TabRepository()) {
+
+    private val logger = LoggerFactory.getLogger("BaseController")
 
     abstract suspend fun doAction(action: String?, params: Map<String, String?>)
 
@@ -54,7 +57,7 @@ abstract class BaseController(
                 val v = View("header_image.html")
                 v.vars["css_id"] = otherPage.headerCssId
                 v.vars["title"] = otherPage.title
-                v.vars["link"] = LinkBuilder.link("page", "show",mapOf(
+                v.vars["link"] = link("page", "show",mapOf(
                     "page_id" to otherPage.id.toString()))
                 v.render()
             }
