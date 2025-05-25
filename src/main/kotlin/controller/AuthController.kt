@@ -9,6 +9,7 @@ class AuthController(private val call: RoutingCall) : BaseController(call) {
     override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
         return when (action?.lowercase()) {
             "login" -> login()
+            "logout" -> logout()
             "authenticate" -> authenticate(params["username"], params["password"])
             else -> null
         }
@@ -19,6 +20,11 @@ class AuthController(private val call: RoutingCall) : BaseController(call) {
         view.vars["action_link"] = LinkBuilder.build("auth", "authenticate")
         // TODO render page
         return view.render()
+    }
+
+    fun logout() : String {
+        Authenticator.logout(call)
+        return PageController(call).show(isLoggedIn = false)
     }
 
     fun authenticate(username: String?, password: String?): String {

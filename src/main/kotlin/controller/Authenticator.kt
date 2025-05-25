@@ -14,7 +14,7 @@ object Authenticator {
         // TODO settings for username and password
         val isValid = username == "admin" && password == "pass"
         if (isValid) {
-            setCookie(call)
+            setCookie(call, hashValue(COOKIE_VALUE))
         }
         return isValid
     }
@@ -25,15 +25,19 @@ object Authenticator {
         return cookieValue != null && cookieValue == hashValue(COOKIE_VALUE)
     }
 
+    fun logout(call: ApplicationCall) {
+        setCookie(call, "")
+    }
+
     private fun hashValue(value: String): String {
         return value.hashCode().toString()
     }
 
-    private fun setCookie(call: ApplicationCall) {
+    private fun setCookie(call: ApplicationCall, value: String) {
         call.response.cookies.append(
             Cookie(
                 name = COOKIE_NAME,
-                value = hashValue(COOKIE_VALUE),
+                value = value,
                 path = "/"
             )
         )
