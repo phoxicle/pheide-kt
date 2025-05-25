@@ -33,6 +33,21 @@ class TabRepository {
                 .map { Tab(it) }
         }
     }
+
+    fun update(tabId: Int, content: String? = null, aside: String? = null) {
+        transaction {
+            if (content != null) {
+                TabTable.update({ TabTable.id eq tabId }) {
+                    it[TabTable.content] = content
+                }
+            }
+            if (aside != null) {
+                TabTable.update({ TabTable.id eq tabId }) {
+                    it[TabTable.aside] = aside
+                }
+            }
+        }
+    }
 }
 
 data class Tab(

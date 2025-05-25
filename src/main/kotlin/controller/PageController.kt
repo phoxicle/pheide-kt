@@ -21,12 +21,11 @@ class PageController(
 
     suspend fun show(pageId: Int? = null) {
         val page = if (pageId == null) {
-            pageRepository.selectDefault()
+            val defaultPageId = pageRepository.selectDefault()?.id
+            // TODO error handling
+            TabController(call).show(defaultPageId!!)
         } else {
-            pageRepository.selectById(pageId)
-        } ?: throw NoSuchElementException("Page with id $pageId not found")
-
-        // TODO redirect?
-        TabController(call).show(page)
+            TabController(call).show(pageId)
+        }
     }
 }

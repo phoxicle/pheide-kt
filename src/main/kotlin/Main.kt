@@ -50,10 +50,16 @@ fun main() {
 
                 // Parameters to pass to controller
                 val formParameters = call.receiveParameters()
+                logger.debug("Form parameters: $formParameters")
                 val params = mapOf(
                     "username" to formParameters["username"],
-                    "password" to formParameters["password"]
+                    "password" to formParameters["password"],
+                    "page_id" to formParameters["page_id"],
+                    "tab_id" to formParameters["tab_id"],
+                    "content" to formParameters["content"],
+                    "aside" to formParameters["aside"],
                 )
+                logger.debug("Params: $params")
 
                 val controller = ControllerFactory.get(controllerName, call)
                 controller?.doAction(action, params)

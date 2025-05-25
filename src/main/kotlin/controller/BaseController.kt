@@ -28,7 +28,7 @@ abstract class BaseController(
         call.respondRedirect(url)
     }
 
-    fun renderPage(view: View, page: Page? = null, tab: Tab? = null) : String {
+    fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null) : String {
         // Login/logout
         view.vars["auth_button"] = if (Authenticator.isLoggedIn(call)) {
             View("auth/logout_button.html",
@@ -41,7 +41,12 @@ abstract class BaseController(
         }
 
         // Header
-        view.vars["page_title"] = page?.title ?: ""
+        // TODO nullable handling
+        view.vars["page_title"] = if (pageId != null) {
+            pageRepository.selectById(pageId)?.title ?: ""
+        } else {
+            ""
+        }
         view.vars["header_images"] = pageRepository
             .selectAll()
             .joinToString("") { otherPage ->
@@ -54,11 +59,11 @@ abstract class BaseController(
             }
 
         // Tab bar
-        view.vars["tab_bar"] = if (page != null) {
+        view.vars["tab_bar"] = if (pageId != null) {
             tabRepository
-                .selectAllByPageId(page.id)
+                .selectAllByPageId(pageId)
                 .joinToString("") { otherTab ->
-                    val v = if (otherTab.id == tab?.id) {
+                    val v = if (otherTab.id == tabId) {
                         View("tab/active_tab.html")
                     } else {
                         View("tab/inactive_tab.html")
@@ -66,7 +71,7 @@ abstract class BaseController(
                     v.vars["tab_title"] = otherTab.title
                     v.vars["tab_link"] = LinkBuilder.build(
                         "tab", "show", mapOf(
-                            "page_id" to page.id.toString(),
+                            "page_id" to pageId.toString(),
                             "tab_id" to otherTab.id.toString()
                         )
                     )

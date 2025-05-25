@@ -1,11 +1,13 @@
 package com.pheide.controller
 
+import com.pheide.controller.Authenticator.verifyAccess
 import com.pheide.repository.Page
 import com.pheide.repository.PageRepository
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
 import io.ktor.server.application.ApplicationCall
 import org.slf4j.LoggerFactory
+import kotlin.text.toInt
 
 class TabController(
     call: ApplicationCall,
@@ -18,19 +20,19 @@ class TabController(
         when (action?.lowercase()) {
             "show" -> {
                 // TODO error handling
-                val pageId = params["page_id"]
-                if (pageId == null) {respond("Missing page id"); return}
-                val page = PageRepository().selectById(pageId.toInt())
-                if (page == null) {respond("Page with id $pageId not found"); return}
-                show(page, params["tab_id"]?.toIntOrNull())
+                show(params["page_id"]!!.toInt(), params["tab_id"]?.toIntOrNull())
             }
+            "update" -> {
+                update(params["page_id"]!!.toInt(), params["tab_id"]!!.toInt(), params["content"], params["aside"])
+            }
+            else -> null
         }
     }
 
-    suspend fun show(page: Page, tabId: Int? = null) {
+    suspend fun show(pageId: Int, tabId: Int? = null) {
         // Retrieve Tab
         val tab = if (tabId == null) {
-            tabRepository.selectDefault(page.id)
+            tabRepository.selectDefault(pageId)
         } else {
             tabRepository.selectById(tabId)
         } ?: throw NoSuchElementException("Tab with id $tabId not found")
@@ -44,11 +46,8 @@ class TabController(
         // If logged in, allow editing of content and aside
         if (Authenticator.isLoggedIn(call)) {
             val varsForEditing = mutableMapOf(
-                "content_edit_action" to LinkBuilder.build("tab", "update", mapOf(
-                    "page_id" to page.id.toString(),
-                    "tab_id" to tab.id.toString(),
-                )),
-                "page_id" to page.id.toString(),
+                "update_action" to LinkBuilder.build("tab", "update"),
+                "page_id" to pageId.toString(),
                 "tab_id" to tab.id.toString(),
                 "content" to tab.content,
                 "aside" to tab.aside,
@@ -58,7 +57,13 @@ class TabController(
             view.vars["aside_edit"] = View("tab/aside_edit.html", varsForEditing).render()
         }
 
-        respond(renderPage(view, page, tab))
+        respond(renderPage(view, pageId, tabId))
+    }
+
+    suspend fun update(pageId: Int, tabId: Int, content: String?, aside: String?) {
+        verifyAccess(call)
+        tabRepository.update(tabId, content, aside)
+        redirect(LinkBuilder.build("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
     }
 
 }
