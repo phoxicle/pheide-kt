@@ -20,7 +20,12 @@ class TabController(
         // TODO error handling
         when (action?.lowercase()) {
             "show" -> show(params["page_id"]!!.toInt(), params["tab_id"]?.toIntOrNull())
-            "update" -> update(params["page_id"]!!.toInt(), params["tab_id"]!!.toInt(), params["content"], params["aside"])
+            "update" -> update(
+                params["page_id"]!!.toInt(),
+                params["tab_id"]!!.toInt(),
+                title = params["title"],
+                content = params["content"],
+                aside = params["aside"])
             "new" -> new(params["page_id"]!!.toInt())
             "create" -> create(params["page_id"]!!.toInt(), params["title"]!!)
             else -> null
@@ -59,9 +64,9 @@ class TabController(
         respond(renderPage(view, pageId, tab.id))
     }
 
-    suspend fun update(pageId: Int, tabId: Int, content: String?, aside: String?) {
+    suspend fun update(pageId: Int, tabId: Int, title: String?, content: String?, aside: String?) {
         verifyAccess(call)
-        tabRepository.update(tabId, content, aside)
+        tabRepository.update(tabId, title, content, aside)
         redirect(LinkBuilder.build("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
     }
 
