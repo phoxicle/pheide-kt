@@ -51,7 +51,6 @@ abstract class BaseController(protected val call: ApplicationCall) {
                         View("tab/inactive_tab.html")
                     }
                     v.vars["tab_title"] = otherTab.title
-                    // TODO link builder
                     v.vars["tab_link"] = LinkBuilder.build(
                         "tab", "show", mapOf(
                             "page_id" to page.id.toString(),

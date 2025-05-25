@@ -24,7 +24,6 @@ class AuthController(call: ApplicationCall) : BaseController(call) {
 
     fun logout() : String {
         Authenticator.logout(call)
-        // TODO full redirect
         return PageController(call).show(isLoggedIn = false)
     }
 
@@ -36,17 +35,17 @@ class AuthController(call: ApplicationCall) : BaseController(call) {
         }
 
         val success = Authenticator.authenticate(call, username, password)
-
-        return if (success) {
-            PageController(call).show(isLoggedIn = true)
-        } else {
-            restricted()
-        }
+        return if (success) success() else restricted()
     }
 
     fun restricted() : String {
         val view = View("auth/restricted.html")
         return renderPage(view, isLoggedIn = false)
+    }
+
+    fun success() : String {
+        val view = View("auth/success.html")
+        return renderPage(view, isLoggedIn = true)
     }
 
 }
