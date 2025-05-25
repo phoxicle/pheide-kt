@@ -5,6 +5,7 @@ class ControllerFactory {
     fun get(controllerName: String): BaseController? {
         return when (controllerName.lowercase()) {
             "page" -> PageController()
+            "tab" -> TabController()
             else -> null
         }
     }

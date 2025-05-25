@@ -11,14 +11,14 @@ class TabController : BaseController() {
     private val logger = LoggerFactory.getLogger(TabController::class.java)
 
     override fun doAction(action: String?, params: Map<String, String?>): String? {
-//        when (action?.lowercase()) {
-//            // TODO validation
-//            "show" -> return show(null, action, params, isAuthenticated, null)
-//            else -> return null
-//        }
-        logger.info("TabController.doAction: action=$action, params=$params")
-        // TODO
-        return null
+        when (action?.lowercase()) {
+            "show" -> {
+                val pageId = params["page_id"] ?: return "Page id not set"
+                val page = PageRepository().selectById(pageId.toInt()) ?: return "Page not found"
+                return show(page, params["tab_id"]?.toIntOrNull())
+            }
+            else -> return null
+        }
     }
 
     fun show(page: Page, tabId: Int? = null): String {
@@ -37,9 +37,6 @@ class TabController : BaseController() {
         view.vars["tab_title"] = tab.title
         view.vars["content"] = tab.content
         view.vars["aside"] = tab.aside
-
-        // TODO move this elsewhere?
-        // Populate page-level view vars
         view.vars["page_title"] = page.title
         view.vars["page_css_id"] = page.headerCssId
 
@@ -57,7 +54,7 @@ class TabController : BaseController() {
         view.vars["header_images"] = headerImagesHtml
 
         // Tab bar vars
-        val tabBarHtml = TabRepository()
+        val tabBarHtml = tabRepository
             .selectAllByPageId(page.id)
             .joinToString("") { tab ->
                 val v = View()
