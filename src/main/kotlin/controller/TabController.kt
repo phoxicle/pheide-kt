@@ -57,7 +57,8 @@ class TabController(
             view.vars["aside_edit"] = View("tab/aside_edit.html", varsForEditing).render()
         }
 
-        respond(renderPage(view, pageId, tabId))
+        // TODO nullable/error handling...
+        respond(renderPage(view, pageId, tab.id))
     }
 
     suspend fun update(pageId: Int, tabId: Int, content: String?, aside: String?) {
