@@ -2,8 +2,9 @@ package com.pheide.controller
 
 import com.pheide.view.View
 import io.ktor.server.application.ApplicationCall
+import org.slf4j.LoggerFactory
 
-val logger = org.slf4j.LoggerFactory.getLogger("AuthController")
+val logger = LoggerFactory.getLogger("AuthController")
 
 class AuthController(call: ApplicationCall) : BaseController(call) {
     override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {

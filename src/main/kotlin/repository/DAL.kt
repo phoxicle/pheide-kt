@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
-val logger = LoggerFactory.getLogger("Main")
+val logger = LoggerFactory.getLogger("DAL")
 
 object DAL {
 

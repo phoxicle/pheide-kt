@@ -3,7 +3,7 @@ package com.pheide.view
 import org.slf4j.LoggerFactory
 
 class View(private val templateName: String, val vars: MutableMap<String, String> = mutableMapOf()) {
-    private val logger = LoggerFactory.getLogger(View::class.java)
+    private val logger = LoggerFactory.getLogger("View")
 
     fun render(additionalVars: Map<String, String> = emptyMap()): String {
         return replaceTemplateVars(readFile(templateName), vars + additionalVars)

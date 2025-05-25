@@ -2,11 +2,14 @@ package com.pheide.controller
 
 import com.pheide.repository.PageRepository
 import io.ktor.server.application.ApplicationCall
+import org.slf4j.LoggerFactory
 
 class PageController(
     call: ApplicationCall,
     private val pageRepository: PageRepository = PageRepository()
 ) : BaseController(call) {
+
+    private val logger = LoggerFactory.getLogger("PageController")
 
     // TODO get rid of nullables
     override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {

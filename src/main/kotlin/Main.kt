@@ -10,9 +10,10 @@ import io.ktor.server.netty.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.slf4j.LoggerFactory
 import java.io.File
 
-val logger = org.slf4j.LoggerFactory.getLogger("Main")
+val logger = LoggerFactory.getLogger("Main")
 
 fun main() {
     // Initialize the database connection

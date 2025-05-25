@@ -12,7 +12,7 @@ class TabController(
     private val tabRepository: TabRepository = TabRepository()
 ) : BaseController(call) {
 
-    private val logger = LoggerFactory.getLogger(TabController::class.java)
+    private val logger = LoggerFactory.getLogger("TabController")
 
     override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
         when (action?.lowercase()) {
