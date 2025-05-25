@@ -43,12 +43,12 @@ class TabController : BaseController() {
         // Header vars
         val headerImagesHtml = PageRepository()
             .selectAll()
-            .joinToString("") { page ->
+            .joinToString("") { otherPage ->
                 val v = View()
-                v.vars["css_id"] = page.headerCssId
-                v.vars["title"] = page.title
+                v.vars["css_id"] = otherPage.headerCssId
+                v.vars["title"] = otherPage.title
                 // TODO link builder
-                v.vars["link"] = "/?controller=page&action=show&page_id=${page.id}"
+                v.vars["link"] = "/?controller=page&action=show&page_id=${otherPage.id}"
                 v.render("header_image.html")
             }
         view.vars["header_images"] = headerImagesHtml
@@ -56,13 +56,12 @@ class TabController : BaseController() {
         // Tab bar vars
         val tabBarHtml = tabRepository
             .selectAllByPageId(page.id)
-            .joinToString("") { tab ->
+            .joinToString("") { otherTab ->
                 val v = View()
-                v.vars["tab_class"] = if (tab.id == tabId) "activeTab" else ""
-                v.vars["tab_title"] = tab.title
+                v.vars["tab_title"] = otherTab.title
                 // TODO link builder
-                v.vars["tab_link"] = "/?controller=tab&action=show&page_id=${page.id}&tab_id=${tab.id}"
-                if (tab.id == tabId) {
+                v.vars["tab_link"] = "/?controller=tab&action=show&page_id=${page.id}&tab_id=${otherTab.id}"
+                if (otherTab.id == tab.id) {
                     v.render("active_tab.html")
                 } else {
                     v.render("inactive_tab.html")
