@@ -1,11 +1,11 @@
 package com.pheide.controller
 
 import com.pheide.view.View
-import io.ktor.server.routing.RoutingCall
+import io.ktor.server.application.ApplicationCall
 
 val logger = org.slf4j.LoggerFactory.getLogger("AuthController")
 
-class AuthController(private val call: RoutingCall) : BaseController(call) {
+class AuthController(call: ApplicationCall) : BaseController(call) {
     override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
         return when (action?.lowercase()) {
             "login" -> login()

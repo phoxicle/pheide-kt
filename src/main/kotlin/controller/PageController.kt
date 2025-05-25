@@ -1,9 +1,12 @@
 package com.pheide.controller
 
 import com.pheide.repository.PageRepository
-import io.ktor.server.routing.RoutingCall
+import io.ktor.server.application.ApplicationCall
 
-class PageController(private val call: RoutingCall) : BaseController(call) {
+class PageController(
+    call: ApplicationCall,
+    private val pageRepository: PageRepository = PageRepository()
+) : BaseController(call) {
 
     // TODO get rid of nullables
     override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
@@ -14,7 +17,6 @@ class PageController(private val call: RoutingCall) : BaseController(call) {
     }
 
     fun show(pageId: Int? = null, isLoggedIn: Boolean): String {
-        val pageRepository = PageRepository()
         val page = if (pageId == null) {
             pageRepository.selectDefault()
         } else {

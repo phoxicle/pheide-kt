@@ -4,10 +4,13 @@ import com.pheide.repository.Page
 import com.pheide.repository.PageRepository
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
-import io.ktor.server.routing.RoutingCall
+import io.ktor.server.application.ApplicationCall
 import org.slf4j.LoggerFactory
 
-class TabController(private val call: RoutingCall) : BaseController(call) {
+class TabController(
+    call: ApplicationCall,
+    private val tabRepository: TabRepository = TabRepository()
+) : BaseController(call) {
 
     private val logger = LoggerFactory.getLogger(TabController::class.java)
 
@@ -25,9 +28,9 @@ class TabController(private val call: RoutingCall) : BaseController(call) {
     fun show(page: Page, tabId: Int? = null, isLoggedIn: Boolean): String {
         // Retrieve Tab
         val tab = if (tabId == null) {
-            TabRepository().selectDefault(page.id)
+            tabRepository.selectDefault(page.id)
         } else {
-            TabRepository().selectById(tabId)
+            tabRepository.selectById(tabId)
         } ?: throw NoSuchElementException("Tab with id $tabId not found")
 
         val view = View("tab/show.html", mutableMapOf(

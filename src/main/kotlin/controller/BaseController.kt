@@ -5,10 +5,13 @@ import com.pheide.repository.PageRepository
 import com.pheide.repository.Tab
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
-import io.ktor.server.routing.RoutingCall
+import io.ktor.server.application.ApplicationCall
 import kotlin.collections.set
 
-abstract class BaseController(private val call: RoutingCall) {
+abstract class BaseController(protected val call: ApplicationCall) {
+
+    private val pageRepository = PageRepository()
+    private val tabRepository = TabRepository()
 
     abstract fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String?
 
@@ -26,7 +29,7 @@ abstract class BaseController(private val call: RoutingCall) {
 
         // Header
         view.vars["page_title"] = page?.title ?: ""
-        view.vars["header_images"] = PageRepository()
+        view.vars["header_images"] = pageRepository
             .selectAll()
             .joinToString("") { otherPage ->
                 val v = View("header_image.html")
@@ -39,7 +42,7 @@ abstract class BaseController(private val call: RoutingCall) {
 
         // Tab bar
         view.vars["tab_bar"] = if (page != null) {
-            TabRepository()
+            tabRepository
                 .selectAllByPageId(page.id)
                 .joinToString("") { otherTab ->
                     val v = if (otherTab.id == tab?.id) {
@@ -64,7 +67,7 @@ abstract class BaseController(private val call: RoutingCall) {
 }
 
 object ControllerFactory {
-    fun get(controllerName: String, call: RoutingCall): BaseController? {
+    fun get(controllerName: String, call: ApplicationCall): BaseController? {
         return when (controllerName.lowercase()) {
             "page" -> PageController(call)
             "tab" -> TabController(call)
