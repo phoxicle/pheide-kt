@@ -2,32 +2,36 @@ package com.pheide.controller
 
 import com.pheide.view.View
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.response.respondRedirect
 import org.slf4j.LoggerFactory
 
 val logger = LoggerFactory.getLogger("AuthController")
 
 class AuthController(call: ApplicationCall) : BaseController(call) {
-    override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
-        return when (action?.lowercase()) {
+
+    override suspend fun doAction(action: String?, params: Map<String, String?>) {
+        when (action?.lowercase()) {
             "login" -> login()
             "logout" -> logout()
             "authenticate" -> authenticate(params["username"], params["password"])
+            "success" -> success()
             else -> null
         }
     }
 
-    fun login() : String {
+    suspend fun login() {
         val view = View("auth/login.html")
         view.vars["action_link"] = LinkBuilder.build("auth", "authenticate")
-        return renderPage(view, isLoggedIn = false)
+        respond(renderPage(view))
     }
 
-    fun logout() : String {
+    suspend fun logout() {
+        Authenticator.verifyAccess(call)
         Authenticator.logout(call)
-        return PageController(call).show(isLoggedIn = false)
+        redirect(LinkBuilder.build("page", "show"))
     }
 
-    fun authenticate(username: String?, password: String?): String {
+    suspend fun authenticate(username: String?, password: String?) {
         logger.debug("Authenticating username: $username")
         if (username == null || password == null) {
             // TODO consistent error handling
@@ -35,17 +39,22 @@ class AuthController(call: ApplicationCall) : BaseController(call) {
         }
 
         val success = Authenticator.authenticate(call, username, password)
-        return if (success) success() else restricted()
+        return if (success) {
+            redirect(LinkBuilder.build("auth", "success"))
+        } else {
+            redirect(LinkBuilder.build("auth", "restricted"))
+        }
     }
 
-    fun restricted() : String {
+    suspend fun restricted() {
         val view = View("auth/restricted.html")
-        return renderPage(view, isLoggedIn = false)
+        respond(renderPage(view))
     }
 
-    fun success() : String {
+    suspend fun success() {
+        Authenticator.verifyAccess(call)
         val view = View("auth/success.html")
-        return renderPage(view, isLoggedIn = true)
+        respond(renderPage(view))
     }
 
 }

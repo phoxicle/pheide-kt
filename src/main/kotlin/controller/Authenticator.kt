@@ -19,9 +19,15 @@ object Authenticator {
         return isValid
     }
 
+    fun verifyAccess(call: ApplicationCall) {
+        if (!isLoggedIn(call)) {
+            throw Exception("User is not logged in")
+        }
+    }
+
     fun isLoggedIn(call: ApplicationCall): Boolean {
         val cookieValue = call.request.cookies[COOKIE_NAME]
-
+        logger.info("Retrieved cookie content: $cookieValue, expected val: $COOKIE_VALUE, expected hash: ${hashValue(COOKIE_VALUE)}")
         return cookieValue != null && cookieValue == hashValue(COOKIE_VALUE)
     }
 

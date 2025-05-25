@@ -14,18 +14,20 @@ class TabController(
 
     private val logger = LoggerFactory.getLogger("TabController")
 
-    override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
+    override suspend fun doAction(action: String?, params: Map<String, String?>) {
         when (action?.lowercase()) {
             "show" -> {
-                val pageId = params["page_id"] ?: return "Page id not set"
-                val page = PageRepository().selectById(pageId.toInt()) ?: return "Page not found"
-                return show(page, params["tab_id"]?.toIntOrNull(), isLoggedIn)
+                // TODO error handling
+                val pageId = params["page_id"]
+                if (pageId == null) {respond("Missing page id"); return}
+                val page = PageRepository().selectById(pageId.toInt())
+                if (page == null) {respond("Page with id $pageId not found"); return}
+                show(page, params["tab_id"]?.toIntOrNull())
             }
-            else -> return null
         }
     }
 
-    fun show(page: Page, tabId: Int? = null, isLoggedIn: Boolean): String {
+    suspend fun show(page: Page, tabId: Int? = null) {
         // Retrieve Tab
         val tab = if (tabId == null) {
             tabRepository.selectDefault(page.id)
@@ -39,8 +41,7 @@ class TabController(
             "aside" to tab.aside,
         ))
 
-        return renderPage(view, isLoggedIn, page, tab)
+        respond(renderPage(view, page, tab))
     }
-
 
 }

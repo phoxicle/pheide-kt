@@ -22,7 +22,6 @@ class View(private val templateName: String, val vars: MutableMap<String, String
     private fun replaceTemplateVars(content: String, templateVars: Map<String, String>): String {
         var result = content
         for ((key, value) in templateVars) {
-            logger.debug("Replacing template variable: $key: $value")
             result = result.replace("%%%$key%%%", value)
         }
         return result
@@ -30,7 +29,6 @@ class View(private val templateName: String, val vars: MutableMap<String, String
 
     private fun readFile(templateName: String): String {
         // Use View::class.java to get the class loader
-        logger.debug("Reading template file: $templateName")
         val resourceStream = View::class.java.classLoader.getResourceAsStream("templates/$templateName")
             ?: throw Exception("Template file not found: $templateName")
 

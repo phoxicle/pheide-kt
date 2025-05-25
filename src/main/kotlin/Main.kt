@@ -30,8 +30,7 @@ fun main() {
                 // TODO look at proper routing
                 val controllerName = call.request.queryParameters["controller"] ?: "page"
                 val action = call.request.queryParameters["action"] ?: "show"
-                val isLoggedIn = Authenticator.isLoggedIn(call)
-                logger.info("Is logged in: $isLoggedIn")
+                logger.info("GET: $controllerName::$action, isAuthenticated: ${Authenticator.isLoggedIn(call)}")
 
                 // Parameters to pass to controller
                 val params = mapOf(
@@ -41,16 +40,13 @@ fun main() {
 
                 // TODO error handling
                 val controller = ControllerFactory.get(controllerName, call)
-                val responseText = controller?.doAction(action, params, isLoggedIn)
+                controller?.doAction(action, params)
                     ?: "Controller or action not found"
-
-                call.respondText(responseText, ContentType.Text.Html)
             }
             post("/") {
                 val controllerName = call.request.queryParameters["controller"] ?: "auth"
                 val action = call.request.queryParameters["action"] ?: "authenticate"
-                val isLoggedIn = Authenticator.isLoggedIn(call)
-                logger.info("Is logged in: $isLoggedIn")
+                logger.info("POST: $controllerName::$action, isAuthenticated: ${Authenticator.isLoggedIn(call)}")
 
                 // Parameters to pass to controller
                 val formParameters = call.receiveParameters()
@@ -60,10 +56,8 @@ fun main() {
                 )
 
                 val controller = ControllerFactory.get(controllerName, call)
-                val responseText = controller?.doAction(action, params, isLoggedIn)
+                controller?.doAction(action, params)
                     ?: "Controller or action not found"
-
-                call.respondText(responseText, ContentType.Text.Html)
             }
         }
     }.start(wait = true)

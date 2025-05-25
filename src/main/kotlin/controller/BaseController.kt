@@ -5,19 +5,32 @@ import com.pheide.repository.PageRepository
 import com.pheide.repository.Tab
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
+import io.ktor.http.ContentType
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.response.respondRedirect
+import io.ktor.server.response.respondText
 import kotlin.collections.set
 
-abstract class BaseController(protected val call: ApplicationCall) {
+abstract class BaseController(
+    protected val call: ApplicationCall,
+    private val pageRepository: PageRepository = PageRepository(),
+    private val tabRepository: TabRepository = TabRepository()) {
 
-    private val pageRepository = PageRepository()
-    private val tabRepository = TabRepository()
+    abstract suspend fun doAction(action: String?, params: Map<String, String?>)
 
-    abstract fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String?
+    suspend fun respond(responseText: String) {
+        logger.info("Responding")
+        call.respondText(responseText, ContentType.Text.Html)
+    }
 
-    fun renderPage(view: View, isLoggedIn: Boolean, page: Page? = null, tab: Tab? = null) : String {
+    suspend fun redirect(url: String) {
+        logger.info("Redirecting to $url")
+        call.respondRedirect(url)
+    }
+
+    fun renderPage(view: View, page: Page? = null, tab: Tab? = null) : String {
         // Login/logout
-        view.vars["auth_button"] = if (isLoggedIn) {
+        view.vars["auth_button"] = if (Authenticator.isLoggedIn(call)) {
             View("auth/logout_button.html",
                 mutableMapOf("action_link" to LinkBuilder.build("auth", "logout")))
                 .render()

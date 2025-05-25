@@ -12,20 +12,21 @@ class PageController(
     private val logger = LoggerFactory.getLogger("PageController")
 
     // TODO get rid of nullables
-    override fun doAction(action: String?, params: Map<String, String?>, isLoggedIn: Boolean): String? {
-        return when (action?.lowercase()) {
-            "show" -> show(params["page_id"]?.toIntOrNull(), isLoggedIn)
+    override suspend fun doAction(action: String?, params: Map<String, String?>) {
+        when (action?.lowercase()) {
+            "show" -> show(params["page_id"]?.toIntOrNull())
             else -> null
         }
     }
 
-    fun show(pageId: Int? = null, isLoggedIn: Boolean): String {
+    suspend fun show(pageId: Int? = null) {
         val page = if (pageId == null) {
             pageRepository.selectDefault()
         } else {
             pageRepository.selectById(pageId)
         } ?: throw NoSuchElementException("Page with id $pageId not found")
 
-        return TabController(call).show(page, isLoggedIn = isLoggedIn)
+        // TODO redirect?
+        TabController(call).show(page)
     }
 }
