@@ -106,14 +106,12 @@ abstract class BaseController(
 
         // TODO probably goes inside the above
         // If logged in, add to the tab bar
-        if (pageId != null && isLoggedIn(call)) {
+        if (pageId != null) {
             view.vars["plus_tab"] = View("tab/partials/plus_tab.html", mutableMapOf(
                 "action_link" to LinkBuilder.link("tab", "new", mapOf(
                     "page_id" to pageId.toString()
                 ))
-            )).render()
-        } else {
-            view.vars["plus_tab"] = ""
+            )).renderIf(isLoggedIn(call) && view.vars["new_tab"].isNullOrEmpty())
         }
 
         // TODO when not logged in, hide vars like edits, new tab, etc.

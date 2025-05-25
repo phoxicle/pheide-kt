@@ -1,5 +1,6 @@
 package com.pheide.controller
 
+import com.pheide.controller.Authenticator.isLoggedIn
 import com.pheide.controller.Authenticator.verifyAccess
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
@@ -47,18 +48,17 @@ class TabController(
         ))
 
         // If logged in, allow editing of content and aside
-        if (Authenticator.isLoggedIn(call)) {
-            val varsForEditing = mutableMapOf(
-                "update_action" to LinkBuilder.link("tab", "update"),
-                "page_id" to pageId.toString(),
-                "tab_id" to tab.id.toString(),
-                "content" to tab.content,
-                "aside" to tab.aside,
-            )
-
-            view.vars["content_edit"] = View("tab/partials/content_edit.html", varsForEditing).render()
-            view.vars["aside_edit"] = View("tab/partials/aside_edit.html", varsForEditing).render()
-        }
+        val varsForEditing = mutableMapOf(
+            "update_action" to LinkBuilder.link("tab", "update"),
+            "page_id" to pageId.toString(),
+            "tab_id" to tab.id.toString(),
+            "content" to tab.content,
+            "aside" to tab.aside,
+        )
+        view.vars["content_edit"] = View("tab/partials/content_edit.html", varsForEditing)
+            .renderIf(isLoggedIn(call))
+        view.vars["aside_edit"] = View("tab/partials/aside_edit.html", varsForEditing)
+            .renderIf(isLoggedIn(call))
 
         // TODO nullable/error handling...
         respond(renderPage(view, pageId, tab.id))
@@ -76,11 +76,10 @@ class TabController(
         // Same as tab show, except with a fake, new tab
         val view = View("tab/show.html")
 
-        // TODO hide plus tab
         view.vars["new_tab"] = View("tab/partials/new_tab.html", mutableMapOf(
             "action_link" to LinkBuilder.link("tab", "create"),
             "page_id" to pageId.toString(),
-        )).render()
+        )).renderIf(isLoggedIn(call))
 
         respond(renderPage(view, pageId))
     }
