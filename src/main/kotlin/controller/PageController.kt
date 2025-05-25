@@ -3,7 +3,6 @@ package com.pheide.controller
 import com.pheide.repository.PageRepository
 import io.ktor.server.routing.RoutingCall
 
-// TODO this vs super vars
 class PageController(private val call: RoutingCall) : BaseController(call) {
 
     // TODO get rid of nullables

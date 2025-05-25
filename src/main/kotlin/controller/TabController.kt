@@ -33,7 +33,7 @@ class TabController(private val call: RoutingCall) : BaseController(call) {
 
         // TODO decide where to populate all of these
 
-        val view = View()
+        val view = View("tab/show.html")
         // Populate tab-level vars
         view.vars["tab_title"] = tab.title
         view.vars["content"] = tab.content
@@ -42,43 +42,45 @@ class TabController(private val call: RoutingCall) : BaseController(call) {
         view.vars["page_css_id"] = page.headerCssId
 
         // Header vars
-        val authButton = View()
-        if (isLoggedIn) {
-            // TODO move template inside View constructor
-            authButton.vars["action_link"] = "/?controller=auth&action=logout"
-            view.vars["auth_button"] = authButton.render("auth/logout_button.html")
+        view.vars["auth_button"] = if (isLoggedIn) {
+            View("auth/logout_button.html",
+                mutableMapOf("action_link" to LinkBuilder.build("auth", "logout")))
+                .render()
         } else {
-            authButton.vars["action_link"] = "/?controller=auth&action=login"
-            view.vars["auth_button"] = authButton.render("auth/login_button.html")
+            View("auth/login_button.html",
+                mutableMapOf("action_link" to LinkBuilder.build("auth", "login")))
+                .render()
         }
 
         view.vars["header_images"] = PageRepository()
             .selectAll()
             .joinToString("") { otherPage ->
-                val v = View()
+                val v = View("header_image.html")
                 v.vars["css_id"] = otherPage.headerCssId
                 v.vars["title"] = otherPage.title
-                // TODO link builder
-                v.vars["link"] = "/?controller=page&action=show&page_id=${otherPage.id}"
-                v.render("header_image.html")
+                v.vars["link"] = LinkBuilder.build("page", "show",mapOf(
+                    "page_id" to "$otherPage.id"))
+                v.render()
             }
 
         // Tab bar vars
         view.vars["tab_bar"] = tabRepository
             .selectAllByPageId(page.id)
             .joinToString("") { otherTab ->
-                val v = View()
+                val v = if (otherTab.id == tab.id) {
+                    View("tab/active_tab.html")
+                } else {
+                    View("tab/inactive_tab.html")
+                }
                 v.vars["tab_title"] = otherTab.title
                 // TODO link builder
-                v.vars["tab_link"] = "/?controller=tab&action=show&page_id=${page.id}&tab_id=${otherTab.id}"
-                if (otherTab.id == tab.id) {
-                    v.render("tab/active_tab.html")
-                } else {
-                    v.render("tab/inactive_tab.html")
-                }
+                v.vars["tab_link"] = LinkBuilder.build("tab", "show", mapOf(
+                    "page_id" to "$page.id",
+                    "tab_id" to "$otherTab.id"))
+                v.render()
             }
 
-        return view.renderPage("tab/show.html")
+        return view.renderPage()
     }
 
 

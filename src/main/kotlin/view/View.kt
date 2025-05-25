@@ -2,20 +2,20 @@ package com.pheide.view
 
 import org.slf4j.LoggerFactory
 
-class View(val vars: MutableMap<String, String> = mutableMapOf()) {
+class View(private val templateName: String, val vars: MutableMap<String, String> = mutableMapOf()) {
     private val logger = LoggerFactory.getLogger(View::class.java)
 
-    fun render(templateName: String): String {
-        return replaceTemplateVars(readFile(templateName), vars)
+    fun render(additionalVars: Map<String, String> = emptyMap()): String {
+        return replaceTemplateVars(readFile(templateName), vars + additionalVars)
     }
 
-    fun renderPage(templateName: String): String {
+    fun renderPage(additionalVars: Map<String, String> = emptyMap()): String {
         val body = readFile(templateName)
         val header = readFile("header.html")
         val footer = readFile("footer.html")
 
         var content = header + body + footer
-        content = replaceTemplateVars(content, vars)
+        content = replaceTemplateVars(content, vars + additionalVars)
         return content
     }
 
