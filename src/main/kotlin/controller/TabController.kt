@@ -59,7 +59,7 @@ class TabController(private val call: RoutingCall) : BaseController(call) {
                 v.vars["css_id"] = otherPage.headerCssId
                 v.vars["title"] = otherPage.title
                 v.vars["link"] = LinkBuilder.build("page", "show",mapOf(
-                    "page_id" to "$otherPage.id"))
+                    "page_id" to otherPage.id.toString()))
                 v.render()
             }
 
@@ -75,8 +75,8 @@ class TabController(private val call: RoutingCall) : BaseController(call) {
                 v.vars["tab_title"] = otherTab.title
                 // TODO link builder
                 v.vars["tab_link"] = LinkBuilder.build("tab", "show", mapOf(
-                    "page_id" to "$page.id",
-                    "tab_id" to "$otherTab.id"))
+                    "page_id" to page.id.toString(),
+                    "tab_id" to otherTab.id.toString()))
                 v.render()
             }
 
