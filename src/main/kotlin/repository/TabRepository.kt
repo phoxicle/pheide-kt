@@ -34,12 +34,13 @@ class TabRepository {
         }
     }
 
-    fun update(tabId: Int, title: String? = null, content: String? = null, aside: String? = null) {
+    fun update(tabId: Int, title: String? = null, content: String? = null, aside: String? = null, sorting: Int? = null) {
         transaction {
             TabTable.update({ TabTable.id eq tabId }) {
                 if (content != null) it[TabTable.content] = content
                 if (aside != null) it[TabTable.aside] = aside
                 if (title != null) it[TabTable.title] = title
+                if (sorting != null) it[TabTable.sorting] = sorting
             }
         }
     }

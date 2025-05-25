@@ -35,7 +35,8 @@ fun main() {
                 // Parameters to pass to controller
                 val params = mapOf(
                     "page_id" to call.request.queryParameters["page_id"],
-                    "tab_id" to call.request.queryParameters["tab_id"]
+                    "tab_id" to call.request.queryParameters["tab_id"],
+                    "direction" to call.request.queryParameters["direction"],
                 )
 
                 // TODO error handling
