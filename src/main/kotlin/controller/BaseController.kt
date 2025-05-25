@@ -31,11 +31,11 @@ abstract class BaseController(
     fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null) : String {
         // Login/logout
         view.vars["auth_button"] = if (Authenticator.isLoggedIn(call)) {
-            View("auth/logout_button.html",
+            View("auth/partials/logout_button.html",
                 mutableMapOf("action_link" to LinkBuilder.build("auth", "logout")))
                 .render()
         } else {
-            View("auth/login_button.html",
+            View("auth/partials/login_button.html",
                 mutableMapOf("action_link" to LinkBuilder.build("auth", "login")))
                 .render()
         }
@@ -64,9 +64,9 @@ abstract class BaseController(
                 .selectAllByPageId(pageId)
                 .joinToString("") { otherTab ->
                     val v = if (otherTab.id == tabId) {
-                        View("tab/active_tab.html")
+                        View("tab/partials/active_tab.html")
                     } else {
-                        View("tab/inactive_tab.html")
+                        View("tab/partials/inactive_tab.html")
                     }
                     v.vars["tab_title"] = otherTab.title
                     v.vars["tab_link"] = LinkBuilder.build(
@@ -82,7 +82,7 @@ abstract class BaseController(
         // TODO probably goes inside the above
         // If logged in, add to the tab bar
         if (pageId != null && Authenticator.isLoggedIn(call)) {
-            view.vars["plus_tab"] = View("tab/plus_tab.html", mutableMapOf(
+            view.vars["plus_tab"] = View("tab/partials/plus_tab.html", mutableMapOf(
                 "action_link" to LinkBuilder.build("tab", "new", mapOf(
                     "page_id" to pageId.toString()
                 ))

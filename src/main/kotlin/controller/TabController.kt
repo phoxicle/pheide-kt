@@ -51,8 +51,8 @@ class TabController(
                 "aside" to tab.aside,
             )
 
-            view.vars["content_edit"] = View("tab/content_edit.html", varsForEditing).render()
-            view.vars["aside_edit"] = View("tab/aside_edit.html", varsForEditing).render()
+            view.vars["content_edit"] = View("tab/partials/content_edit.html", varsForEditing).render()
+            view.vars["aside_edit"] = View("tab/partials/aside_edit.html", varsForEditing).render()
         }
 
         // TODO nullable/error handling...
@@ -72,7 +72,7 @@ class TabController(
         val view = View("tab/show.html")
 
         // TODO hide plus tab
-        view.vars["new_tab"] = View("tab/new_tab.html", mutableMapOf(
+        view.vars["new_tab"] = View("tab/partials/new_tab.html", mutableMapOf(
             "action_link" to LinkBuilder.build("tab", "create"),
             "page_id" to pageId.toString(),
         )).render()
