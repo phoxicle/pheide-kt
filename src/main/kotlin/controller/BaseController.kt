@@ -79,6 +79,16 @@ abstract class BaseController(
                 }
             } else { "" }
 
+        // TODO probably goes inside the above
+        // If logged in, add to the tab bar
+        if (pageId != null && Authenticator.isLoggedIn(call)) {
+            view.vars["tab_bar"] += View("tab/plus_tab.html", mutableMapOf(
+                "action_link" to LinkBuilder.build("tab", "new", mapOf(
+                    "page_id" to pageId.toString()
+                ))
+            )).render()
+        }
+
         return view.renderPage()
     }
 }
