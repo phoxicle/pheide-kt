@@ -41,6 +41,23 @@ class TabController(
             "aside" to tab.aside,
         ))
 
+        // If logged in, allow editing of content and aside
+        if (Authenticator.isLoggedIn(call)) {
+            val varsForEditing = mutableMapOf(
+                "content_edit_action" to LinkBuilder.build("tab", "update", mapOf(
+                    "page_id" to page.id.toString(),
+                    "tab_id" to tab.id.toString(),
+                )),
+                "page_id" to page.id.toString(),
+                "tab_id" to tab.id.toString(),
+                "content" to tab.content,
+                "aside" to tab.aside,
+            )
+
+            view.vars["content_edit"] = View("tab/content_edit.html", varsForEditing).render()
+            view.vars["aside_edit"] = View("tab/aside_edit.html", varsForEditing).render()
+        }
+
         respond(renderPage(view, page, tab))
     }
 
