@@ -18,6 +18,7 @@ class PageController(
         when (action?.lowercase()) {
             "show" -> show(params["page_id"]?.toIntOrNull())
             "delete" -> delete(params["page_id"]!!.toInt())
+            "update" -> update(params["page_id"]!!.toInt(), params["title"])
             else -> null
         }
     }
@@ -36,5 +37,13 @@ class PageController(
         verifyAccess(call)
         pageRepository.delete(pageId)
         redirect(link("page", "show"))
+    }
+
+    suspend fun update(pageId: Int, title: String?) {
+        verifyAccess(call)
+        pageRepository.update(pageId, title)
+        redirect(LinkBuilder.link("page", "show", mapOf(
+            "page_id" to pageId.toString()
+        )))
     }
 }

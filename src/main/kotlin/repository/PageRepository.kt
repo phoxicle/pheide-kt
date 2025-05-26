@@ -32,6 +32,14 @@ class PageRepository {
         }
     }
 
+    fun update(pageId: Int, title: String? = null) {
+        transaction {
+            PageTable.update({ PageTable.id eq pageId }) {
+                if (title != null) it[TabTable.title] = title
+            }
+        }
+    }
+
     fun delete(pageId: Int) {
         transaction {
             PageTable.deleteWhere {

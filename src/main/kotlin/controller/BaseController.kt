@@ -77,7 +77,27 @@ abstract class BaseController(
 
     private fun getPageTitleHtml(pageId: Int?): String {
         return if (pageId != null) {
-            pageRepository.selectById(pageId)?.title ?: ""
+            // TODO nullables / error handling
+            val page = pageRepository.selectById(pageId)!!
+
+            val deleteButton =  View("page/partials/delete_button.html", mutableMapOf(
+                "action_link" to link("page", "delete", mapOf(
+                    "page_id" to pageId.toString()
+                ))
+            )).renderIf(isLoggedIn(call))
+
+            val titleEdit = View("page/partials/title_edit.html", mutableMapOf(
+                "action_link" to link("page", "update"),
+                "page_id" to pageId.toString(),
+                "page_title" to page.title,
+            )).renderIf(isLoggedIn(call))
+
+            View("page/partials/page_title.html", mutableMapOf(
+                "page_title" to page.title,
+                "page_delete_button" to deleteButton,
+                "page_title_edit" to titleEdit
+            )).render()
+
         } else {
             ""
         }
@@ -158,7 +178,6 @@ abstract class BaseController(
 
         view.vars["auth_button"] = getAuthButtonHtml()
         view.vars["page_title"] = getPageTitleHtml(pageId)
-        view.vars["page_delete_button"] = getPageDeleteHtml(pageId)
         view.vars["header_images"] = getHeaderImagesHtml()
         view.vars["tab_bar"] = getTabBarHtml(pageId, tabId)
 
@@ -173,16 +192,6 @@ abstract class BaseController(
         }
 
         return view.renderPage()
-    }
-
-    private fun getPageDeleteHtml(pageId: Int?): String {
-        // TODO nullables / error handling
-        if (pageId == null) { return ""}
-        return View("page/partials/delete_button.html", mutableMapOf(
-            "action_link" to link("page", "delete", mapOf(
-                "page_id" to pageId.toString()
-            ))
-        )).renderIf(isLoggedIn(call))
     }
 }
 
