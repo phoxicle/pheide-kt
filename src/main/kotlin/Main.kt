@@ -60,6 +60,7 @@ fun main() {
                     "title" to formParameters["title"],
                     "content" to formParameters["content"],
                     "aside" to formParameters["aside"],
+                    "is_default" to formParameters["is_default"],
                 )
                 logger.debug("Params: $params")
 

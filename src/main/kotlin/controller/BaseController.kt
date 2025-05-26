@@ -90,6 +90,7 @@ abstract class BaseController(
                 "action_link" to link("page", "update"),
                 "page_id" to pageId.toString(),
                 "page_title" to page.title,
+                "is_default_checked" to if (page.isDefault) "checked" else ""
             )).renderIf(isLoggedIn(call))
 
             View("page/partials/page_title.html", mutableMapOf(

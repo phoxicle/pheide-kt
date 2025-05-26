@@ -32,10 +32,19 @@ class PageRepository {
         }
     }
 
-    fun update(pageId: Int, title: String? = null) {
+    fun selectRandom(): Page? {
+        return transaction {
+            PageTable.selectAll()
+                .map { Page(it) }
+                .firstOrNull()
+        }
+    }
+
+    fun update(pageId: Int, title: String? = null, isDefault: Boolean? = null) {
         transaction {
             PageTable.update({ PageTable.id eq pageId }) {
-                if (title != null) it[TabTable.title] = title
+                if (title != null) it[PageTable.title] = title
+                if (isDefault != null) it[PageTable.isDefault] = isDefault
             }
         }
     }

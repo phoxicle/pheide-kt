@@ -26,15 +26,23 @@ width: 140px;
 text-align: center;
 }
 
-#current a {
+#current a#page_delete_button {
 color: white;
 text-decoration: none;
 vertical-align: super;
 font-size: 12px;
 }
 
-#current a:hover {
+#current a#page_delete_button:hover {
 color: orange;
+}
+
+#current label {
+font-size: 8pt;
+}
+
+#pageTitle_edit {
+margin-top: -10px;
 }
 
 #label{
@@ -43,6 +51,7 @@ font-size:30pt;
 margin: 30px 0 0 20px;
 position:absolute;
 }
+
 ul#cats{
 padding:0;
 margin:-20px 0 0 0;
