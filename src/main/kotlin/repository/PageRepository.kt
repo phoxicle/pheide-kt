@@ -31,6 +31,14 @@ class PageRepository {
                 .firstOrNull()
         }
     }
+
+    fun delete(pageId: Int) {
+        transaction {
+            PageTable.deleteWhere {
+                PageTable.id eq pageId
+            }
+        }
+    }
 }
 
 data class Page(

@@ -12,6 +12,18 @@ import io.ktor.server.response.respondText
 import org.slf4j.LoggerFactory
 import kotlin.collections.set
 
+enum class HeaderCssId {
+    BOOKS,
+    BOTTLE,
+    LAPTOP,
+    MILK,
+    MILL,
+    NOTEBOOK,
+    PURSE,
+    SCISSORS,
+    TOOLS
+}
+
 abstract class BaseController(
     protected val call: ApplicationCall,
     private val pageRepository: PageRepository = PageRepository(),
@@ -61,6 +73,14 @@ abstract class BaseController(
                 )
                 v.render()
             }
+    }
+
+    private fun getPageTitleHtml(pageId: Int?): String {
+        return if (pageId != null) {
+            pageRepository.selectById(pageId)?.title ?: ""
+        } else {
+            ""
+        }
     }
 
     private fun getTabBarHtml(pageId: Int?, tabId: Int?): String {
@@ -137,14 +157,8 @@ abstract class BaseController(
     fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null): String {
 
         view.vars["auth_button"] = getAuthButtonHtml()
-
-        // TODO nullable handling
-        view.vars["page_title"] = if (pageId != null) {
-            pageRepository.selectById(pageId)?.title ?: ""
-        } else {
-            ""
-        }
-
+        view.vars["page_title"] = getPageTitleHtml(pageId)
+        view.vars["page_delete_button"] = getPageDeleteHtml(pageId)
         view.vars["header_images"] = getHeaderImagesHtml()
         view.vars["tab_bar"] = getTabBarHtml(pageId, tabId)
 
@@ -159,6 +173,16 @@ abstract class BaseController(
         }
 
         return view.renderPage()
+    }
+
+    private fun getPageDeleteHtml(pageId: Int?): String {
+        // TODO nullables / error handling
+        if (pageId == null) { return ""}
+        return View("page/partials/delete_button.html", mutableMapOf(
+            "action_link" to link("page", "delete", mapOf(
+                "page_id" to pageId.toString()
+            ))
+        )).renderIf(isLoggedIn(call))
     }
 }
 

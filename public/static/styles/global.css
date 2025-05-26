@@ -26,6 +26,15 @@ width: 140px;
 text-align: center;
 }
 
+#current a {
+color: white;
+text-decoration: none;
+}
+
+#current a:hover {
+color: orange;
+}
+
 #label{
 color:#CCCCCC;
 font-size:30pt;
