@@ -29,6 +29,8 @@ text-align: center;
 #current a {
 color: white;
 text-decoration: none;
+vertical-align: super;
+font-size: 12px;
 }
 
 #current a:hover {
