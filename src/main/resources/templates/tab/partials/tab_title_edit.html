@@ -1,0 +1,17 @@
+<span id="tabTitle_edit"  class="hide">
+    <form action="%%%action_link%%%" method="POST">
+        <input type="hidden" name="page_id" value="%%%page_id%%%" />
+        <input type="hidden" name="tab_id" value="%%%tab_id%%%" />
+        <input type="text" name="title" value="%%%tab_title%%%" size="15"/>
+        <select name="tab[type]">
+            <option value=""></option>
+          <!--
+            <option value="blog" <?php if ($tab['type'] == 'blog') echo 'selected="selected"' ?>>blog</option>
+          <option value="album" <?php if ($tab['type'] == 'album') echo 'selected="selected"' ?>>album</option>
+          -->
+          <option value="blog" selected="%%%blog_selected%%%">blog</option>
+          <option value="album" selected="%%%album_selected%%%">album</option>
+        </select>
+        <input type="submit" value="meow" />
+    </form>
+</span>

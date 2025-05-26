@@ -88,10 +88,17 @@ abstract class BaseController(
                                 "direction" to "right"
                             ))
                         )).renderIf(isLoggedIn(call))
+                        val tabTitleEdit = View("tab/partials/tab_title_edit.html", mutableMapOf(
+                            "action_link" to link("tab", "update"),
+                            "page_id" to pageId.toString(),
+                            "tab_id" to tabId.toString(),
+                            "title" to otherTab.title,
+                        )).renderIf(isLoggedIn(call))
                         View("tab/partials/active_tab.html", mutableMapOf(
                             "delete_button" to deleteButton,
                             "shift_left_button" to shiftLeftButton,
-                            "shift_right_button" to shiftRightButton
+                            "shift_right_button" to shiftRightButton,
+                            "tab_title_edit" to tabTitleEdit
                         ))
                     } else {
                         View("tab/partials/inactive_tab.html")
