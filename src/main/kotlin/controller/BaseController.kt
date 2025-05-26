@@ -31,75 +31,92 @@ abstract class BaseController(
         call.respondRedirect(url)
     }
 
-    fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null) : String {
-
-        // Login/logout
-        view.vars["auth_button"] = if (Authenticator.isLoggedIn(call)) {
-            View("auth/partials/logout_button.html",
-                mutableMapOf("action_link" to LinkBuilder.link("auth", "logout")))
+    private fun getAuthButtonHtml(): String {
+        return if (Authenticator.isLoggedIn(call)) {
+            View(
+                "auth/partials/logout_button.html",
+                mutableMapOf("action_link" to LinkBuilder.link("auth", "logout"))
+            )
                 .render()
         } else {
-            View("auth/partials/login_button.html",
-                mutableMapOf("action_link" to LinkBuilder.link("auth", "login")))
+            View(
+                "auth/partials/login_button.html",
+                mutableMapOf("action_link" to LinkBuilder.link("auth", "login"))
+            )
                 .render()
         }
+    }
 
-        // Header
-        // TODO nullable handling
-        view.vars["page_title"] = if (pageId != null) {
-            pageRepository.selectById(pageId)?.title ?: ""
-        } else {
-            ""
-        }
-        view.vars["header_images"] = pageRepository
+    private fun getHeaderImagesHtml(): String {
+        return pageRepository
             .selectAll()
             .joinToString("") { otherPage ->
                 val v = View("header_image.html")
                 v.vars["css_id"] = otherPage.headerCssId
                 v.vars["title"] = otherPage.title
-                v.vars["link"] = link("page", "show",mapOf(
-                    "page_id" to otherPage.id.toString()))
+                v.vars["link"] = link(
+                    "page", "show", mapOf(
+                        "page_id" to otherPage.id.toString()
+                    )
+                )
                 v.render()
             }
+    }
 
-        // Tab bar
-        view.vars["tab_bar"] = if (pageId != null) {
+    private fun getTabBarHtml(pageId: Int?, tabId: Int?): String {
+        return if (pageId != null) {
             tabRepository
                 .selectAllByPageId(pageId)
                 .joinToString("") { otherTab ->
                     val v = if (otherTab.id == tabId) {
-                        val deleteButton = View("tab/partials/delete_button.html", mutableMapOf(
-                            "action_link" to link("tab", "delete", mapOf(
-                                "page_id" to pageId.toString(),
-                                "tab_id" to tabId.toString()
-                            ))
-                        )).renderIf(isLoggedIn(call))
-                        val shiftLeftButton = View("tab/partials/shift_left_button.html", mutableMapOf(
-                            "action_link" to link("tab", "shift", mapOf(
+                        val deleteButton = View(
+                            "tab/partials/delete_button.html", mutableMapOf(
+                                "action_link" to link(
+                                    "tab", "delete", mapOf(
+                                        "page_id" to pageId.toString(),
+                                        "tab_id" to tabId.toString()
+                                    )
+                                )
+                            )
+                        ).renderIf(isLoggedIn(call))
+                        val shiftLeftButton = View(
+                            "tab/partials/shift_left_button.html", mutableMapOf(
+                                "action_link" to link(
+                                    "tab", "shift", mapOf(
+                                        "page_id" to pageId.toString(),
+                                        "tab_id" to tabId.toString(),
+                                        "direction" to "left"
+                                    )
+                                )
+                            )
+                        ).renderIf(isLoggedIn(call))
+                        val shiftRightButton = View(
+                            "tab/partials/shift_right_button.html", mutableMapOf(
+                                "action_link" to link(
+                                    "tab", "shift", mapOf(
+                                        "page_id" to pageId.toString(),
+                                        "tab_id" to tabId.toString(),
+                                        "direction" to "right"
+                                    )
+                                )
+                            )
+                        ).renderIf(isLoggedIn(call))
+                        val tabTitleEdit = View(
+                            "tab/partials/tab_title_edit.html", mutableMapOf(
+                                "action_link" to link("tab", "update"),
                                 "page_id" to pageId.toString(),
                                 "tab_id" to tabId.toString(),
-                                "direction" to "left"
-                            ))
-                        )).renderIf(isLoggedIn(call))
-                        val shiftRightButton = View("tab/partials/shift_right_button.html", mutableMapOf(
-                            "action_link" to link("tab", "shift", mapOf(
-                                "page_id" to pageId.toString(),
-                                "tab_id" to tabId.toString(),
-                                "direction" to "right"
-                            ))
-                        )).renderIf(isLoggedIn(call))
-                        val tabTitleEdit = View("tab/partials/tab_title_edit.html", mutableMapOf(
-                            "action_link" to link("tab", "update"),
-                            "page_id" to pageId.toString(),
-                            "tab_id" to tabId.toString(),
-                            "title" to otherTab.title,
-                        )).renderIf(isLoggedIn(call))
-                        View("tab/partials/active_tab.html", mutableMapOf(
-                            "delete_button" to deleteButton,
-                            "shift_left_button" to shiftLeftButton,
-                            "shift_right_button" to shiftRightButton,
-                            "tab_title_edit" to tabTitleEdit
-                        ))
+                                "title" to otherTab.title,
+                            )
+                        ).renderIf(isLoggedIn(call))
+                        View(
+                            "tab/partials/active_tab.html", mutableMapOf(
+                                "delete_button" to deleteButton,
+                                "shift_left_button" to shiftLeftButton,
+                                "shift_right_button" to shiftRightButton,
+                                "tab_title_edit" to tabTitleEdit
+                            )
+                        )
                     } else {
                         View("tab/partials/inactive_tab.html")
                     }
@@ -112,7 +129,24 @@ abstract class BaseController(
                     )
                     v.render()
                 }
-            } else { "" }
+        } else {
+            ""
+        }
+    }
+
+    fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null): String {
+
+        view.vars["auth_button"] = getAuthButtonHtml()
+
+        // TODO nullable handling
+        view.vars["page_title"] = if (pageId != null) {
+            pageRepository.selectById(pageId)?.title ?: ""
+        } else {
+            ""
+        }
+
+        view.vars["header_images"] = getHeaderImagesHtml()
+        view.vars["tab_bar"] = getTabBarHtml(pageId, tabId)
 
         // TODO probably goes inside the above
         // If logged in, add to the tab bar
@@ -123,8 +157,6 @@ abstract class BaseController(
                 ))
             )).renderIf(isLoggedIn(call) && view.vars["new_tab"].isNullOrEmpty())
         }
-
-        // TODO when not logged in, hide vars like edits, new tab, etc.
 
         return view.renderPage()
     }
