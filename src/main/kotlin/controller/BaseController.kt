@@ -21,7 +21,7 @@ enum class HeaderCssId {
     NOTEBOOK,
     PURSE,
     SCISSORS,
-    TOOLS
+    // TOOLS // Tools image is corrupted
 }
 
 abstract class BaseController(
@@ -60,19 +60,36 @@ abstract class BaseController(
     }
 
     private fun getHeaderImagesHtml(): String {
-        return pageRepository
-            .selectAll()
+        val pages = pageRepository.selectAll()
+
+        val otherCssIds = HeaderCssId.entries.toMutableSet()
+        val existingPagesHtml = pages
             .joinToString("") { otherPage ->
-                val v = View("header_image.html")
-                v.vars["css_id"] = otherPage.headerCssId
-                v.vars["title"] = otherPage.title
-                v.vars["link"] = link(
-                    "page", "show", mapOf(
-                        "page_id" to otherPage.id.toString()
+                // This cssId is already in use
+                otherCssIds.remove(HeaderCssId.valueOf(otherPage.headerCssId.uppercase()))
+
+                View("header_image.html", mutableMapOf(
+                    "css_id" to otherPage.headerCssId,
+                    "title" to otherPage.title,
+                    "link" to link(
+                        "page", "show", mapOf(
+                            "page_id" to otherPage.id.toString())
                     )
-                )
-                v.render()
+                )).render()
             }
+
+        // For creating new pages
+        val otherPagesHtml = otherCssIds.joinToString("") { cssId ->
+            View("header_image.html", mutableMapOf(
+                "css_id" to cssId.toString().lowercase(),
+                "title" to "+",
+                "link" to link("page", "create", mapOf(
+                        "header_css_id" to cssId.toString().lowercase()
+                ))
+            )).renderIf(isLoggedIn(call))
+        }
+
+        return existingPagesHtml + otherPagesHtml
     }
 
     private fun getPageTitleHtml(pageId: Int?): String {

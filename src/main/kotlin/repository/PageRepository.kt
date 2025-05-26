@@ -40,6 +40,17 @@ class PageRepository {
         }
     }
 
+    fun create(title: String, headerCssId: String, isDefault: Boolean): Int {
+        return transaction {
+            val insertedId = PageTable.insert {
+                it[PageTable.title] = title
+                it[PageTable.headerCssId] = headerCssId
+                it[PageTable.isDefault] = isDefault
+            } get PageTable.id
+            insertedId.value
+        }
+    }
+
     fun update(pageId: Int, title: String? = null, isDefault: Boolean? = null) {
         transaction {
             PageTable.update({ PageTable.id eq pageId }) {

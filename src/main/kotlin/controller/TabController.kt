@@ -47,36 +47,37 @@ class TabController(
     }
 
     suspend fun show(pageId: Int, tabId: Int? = null) {
+        val view = View("tab/show.html")
+
         // Retrieve Tab
         val tab = if (tabId == null) {
             tabRepository.selectDefault(pageId)
         } else {
             tabRepository.selectById(tabId)
-        } ?: throw NoSuchElementException("Tab with id $tabId not found")
+        }
 
-        val view = View(
-            "tab/show.html", mutableMapOf(
-                "tab_title" to tab.title,
+        if (tab != null) {
+            view.vars["tab_title"] = tab.title
+            view.vars["content"] = tab.content
+            view.vars["aside"] = tab.aside
+
+            // If logged in, allow editing of content and aside
+            val varsForEditing = mutableMapOf(
+                "update_action" to LinkBuilder.link("tab", "update"),
+                "page_id" to pageId.toString(),
+                "tab_id" to tab.id.toString(),
                 "content" to tab.content,
                 "aside" to tab.aside,
             )
-        )
+            view.vars["content_edit"] = View("tab/partials/content_edit.html", varsForEditing)
+                .renderIf(isLoggedIn(call))
+            view.vars["aside_edit"] = View("tab/partials/aside_edit.html", varsForEditing)
+                .renderIf(isLoggedIn(call))
 
-        // If logged in, allow editing of content and aside
-        val varsForEditing = mutableMapOf(
-            "update_action" to LinkBuilder.link("tab", "update"),
-            "page_id" to pageId.toString(),
-            "tab_id" to tab.id.toString(),
-            "content" to tab.content,
-            "aside" to tab.aside,
-        )
-        view.vars["content_edit"] = View("tab/partials/content_edit.html", varsForEditing)
-            .renderIf(isLoggedIn(call))
-        view.vars["aside_edit"] = View("tab/partials/aside_edit.html", varsForEditing)
-            .renderIf(isLoggedIn(call))
-
-        // TODO nullable/error handling...
-        respond(renderPage(view, pageId, tab.id))
+            respond(renderPage(view, pageId, tab.id))
+        } else {
+            respond(renderPage(view, pageId))
+        }
     }
 
     suspend fun update(pageId: Int, tabId: Int, title: String?, content: String?, aside: String?) {

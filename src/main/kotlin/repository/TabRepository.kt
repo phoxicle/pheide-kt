@@ -66,6 +66,14 @@ class TabRepository {
             }
         }
     }
+
+    fun deleteAllByPageId(pageId: Int) {
+        transaction {
+            TabTable.deleteWhere {
+                TabTable.pageId eq pageId
+            }
+        }
+    }
 }
 
 data class Tab(

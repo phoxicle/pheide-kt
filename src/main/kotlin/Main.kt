@@ -37,6 +37,7 @@ fun main() {
                     "page_id" to call.request.queryParameters["page_id"],
                     "tab_id" to call.request.queryParameters["tab_id"],
                     "direction" to call.request.queryParameters["direction"],
+                    "header_css_id" to call.request.queryParameters["header_css_id"],
                 )
 
                 // TODO error handling
