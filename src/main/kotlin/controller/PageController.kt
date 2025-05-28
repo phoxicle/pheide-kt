@@ -46,6 +46,18 @@ class PageController(
         }
     }
 
+    suspend fun showByTitle(pageTitle: String, tabTitle: String?) {
+        val page = pageRepository.selectByTitle(pageTitle) // You'll need to implement this in PageRepository
+        if (page != null) {
+            TabController(call).showByTitle(page.id, tabTitle)
+        } else {
+            // TODO status code for error pages
+            // status = io.ktor.http.HttpStatusCode.NotFound)
+            error("Page not found")
+        }
+    }
+
+
     suspend fun create(headerCssId: String) {
         verifyAccess(call)
         val pageId = pageRepository.create(title=headerCssId, headerCssId=headerCssId, isDefault=false)

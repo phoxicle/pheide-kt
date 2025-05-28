@@ -23,6 +23,15 @@ class PageRepository {
         }
     }
 
+    fun selectByTitle(title: String): Page? {
+        return transaction {
+            PageTable.selectAll()
+                .where { PageTable.title.lowerCase() eq title.lowercase() }
+                .map { Page(it) }
+                .firstOrNull()
+        }
+    }
+
     fun selectDefault(): Page? {
         return transaction {
             PageTable.selectAll()

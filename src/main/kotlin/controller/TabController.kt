@@ -80,10 +80,23 @@ class TabController(
         }
     }
 
+    suspend fun showByTitle(pageId: Int, tabTitle: String?) {
+        if (tabTitle == null) {
+            show(pageId)
+        } else {
+            val tab = tabRepository.selectByPageIdAndTitle(pageId, tabTitle)
+            if (tab != null) {
+                TabController(call).show(pageId, tab.id)
+            } else {
+                error("Tab not found")
+            }
+        }
+    }
+
     suspend fun update(pageId: Int, tabId: Int, title: String?, content: String?, aside: String?) {
         verifyAccess(call)
         tabRepository.update(tabId, title, content, aside)
-        redirect(LinkBuilder.link("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
+        redirect(link("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
     }
 
     suspend fun new(pageId: Int) {

@@ -15,6 +15,18 @@ class TabRepository {
         }
     }
 
+    fun selectByPageIdAndTitle(pageId: Int, title: String): Tab? {
+        return transaction {
+            TabTable.selectAll()
+                .where {
+                    TabTable.pageId eq pageId
+                    TabTable.title.lowerCase() eq title.lowercase()
+                }
+                .map { Tab(it) }
+                .firstOrNull()
+        }
+    }
+
     fun selectDefault(pageId: Int): Tab? {
         return transaction {
             TabTable.selectAll()
