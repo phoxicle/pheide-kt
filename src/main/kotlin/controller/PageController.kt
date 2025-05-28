@@ -46,7 +46,7 @@ class PageController(
         }
     }
 
-    suspend fun showByTitle(pageTitle: String, tabTitle: String?) {
+    suspend fun showByTitle(pageTitle: String, tabTitle: String? = null) {
         val page = pageRepository.selectByTitle(pageTitle) // You'll need to implement this in PageRepository
         if (page != null) {
             TabController(call).showByTitle(page.id, tabTitle)

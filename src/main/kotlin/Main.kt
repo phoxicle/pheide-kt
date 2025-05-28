@@ -70,15 +70,20 @@ fun main() {
                 controller?.doAction(action, params)
                     ?: "Controller or action not found"
             }
+            get("/go/{pageTitle}") {
+                val pageTitle = call.parameters["pageTitle"]
 
+                if (pageTitle != null) {
+                    PageController(call).showByTitle(pageTitle)
+                } else {
+                    call.respondText("Page or Tab not found", status = io.ktor.http.HttpStatusCode.NotFound)
+                }
+            }
             get("/go/{pageTitle}/{tabTitle}") {
                 val pageTitle = call.parameters["pageTitle"]
                 val tabTitle = call.parameters["tabTitle"]
 
                 if (pageTitle != null) {
-                    // Instantiate your controller and call a method
-                    // You'll need to adjust how PageController is instantiated if it
-                    // requires a call or other dependencies.
                     PageController(call).showByTitle(pageTitle, tabTitle)
                 } else {
                     call.respondText("Page or Tab not found", status = io.ktor.http.HttpStatusCode.NotFound)
