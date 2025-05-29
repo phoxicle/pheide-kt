@@ -34,3 +34,18 @@ kotlin {
 application {
     mainClass.set("com.pheide.MainKt")
 }
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.pheide.MainKt"
+    }
+
+    // This merges all dependencies into one fat/uber JAR
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") }.map { zipTree(it) }
+    })
+}
