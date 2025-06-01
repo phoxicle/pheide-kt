@@ -92,7 +92,7 @@ abstract class BaseController(
         return existingPagesHtml + otherPagesHtml
     }
 
-    private fun getPageTitleHtml(pageId: Int?): String {
+    private fun getCurrentPageHtml(pageId: Int?): String {
         return if (pageId != null) {
             // TODO nullables / error handling
             val page = pageRepository.selectById(pageId)!!
@@ -195,7 +195,12 @@ abstract class BaseController(
     fun renderPage(view: View, pageId: Int? = null, tabId: Int? = null): String {
 
         view.vars["auth_button"] = getAuthButtonHtml()
-        view.vars["page_title"] = getPageTitleHtml(pageId)
+        if (pageId != null) {
+            // TODO reduce db calls
+            val page = pageRepository.selectById(pageId)
+            view.vars["page_title"] = page?.title ?: ""
+        }
+        view.vars["current_page"] = getCurrentPageHtml(pageId)
         view.vars["header_images"] = getHeaderImagesHtml()
         view.vars["tab_bar"] = getTabBarHtml(pageId, tabId)
 
