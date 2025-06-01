@@ -6,17 +6,15 @@ import io.ktor.server.application.ApplicationCall
 object Authenticator {
 
     private const val COOKIE_NAME = "auth_cookie"
-    // TODO settings for top secret cookie value
-    private const val COOKIE_VALUE = "cookie_val"
-
 
     fun authenticate(call: ApplicationCall, username: String, password: String): Boolean {
         val adminUsername = System.getenv("ADMIN_USERNAME") ?: "admin"
         val adminPassword = System.getenv("ADMIN_PASSWORD") ?: "pass"
+        val cookieVal = System.getenv("COOKIE_VALUE") ?: "cookie"
 //        logger.info("Admin username: $adminUsername, password: $adminPassword")
         val isValid = username == adminUsername && password == adminPassword
         if (isValid) {
-            setCookie(call, hashValue(COOKIE_VALUE))
+            setCookie(call, hashValue(cookieVal))
         }
         return isValid
     }
@@ -29,7 +27,8 @@ object Authenticator {
 
     fun isLoggedIn(call: ApplicationCall): Boolean {
         val cookieValue = call.request.cookies[COOKIE_NAME]
-        return cookieValue != null && cookieValue == hashValue(COOKIE_VALUE)
+        val expectedCookieVal = System.getenv("COOKIE_VALUE") ?: "cookie"
+        return cookieValue != null && cookieValue == hashValue(expectedCookieVal)
     }
 
     fun logout(call: ApplicationCall) {
