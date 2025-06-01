@@ -18,9 +18,5 @@ COPY public/static /app/public/static
 # Expose the port your application runs on
 EXPOSE 8080
 
-# Set environment variables (can be overridden at runtime)
-ENV ADMIN_USERNAME=admin
-ENV ADMIN_PASSWORD=pass
-
 # Run the application
 CMD ["java", "-jar", "app.jar"]

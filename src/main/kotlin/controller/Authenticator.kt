@@ -13,7 +13,7 @@ object Authenticator {
     fun authenticate(call: ApplicationCall, username: String, password: String): Boolean {
         val adminUsername = System.getenv("ADMIN_USERNAME") ?: "admin"
         val adminPassword = System.getenv("ADMIN_PASSWORD") ?: "pass"
-        logger.info("Admin username: $adminUsername, password: $adminPassword")
+//        logger.info("Admin username: $adminUsername, password: $adminPassword")
         val isValid = username == adminUsername && password == adminPassword
         if (isValid) {
             setCookie(call, hashValue(COOKIE_VALUE))

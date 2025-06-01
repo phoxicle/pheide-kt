@@ -9,6 +9,7 @@ services:
       - ./data.db:/app/data.db
       - ./public/static:/app/public/static
     environment:
+      # override in env file
       - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-pass}
     restart: unless-stopped

@@ -46,3 +46,4 @@ bin/
 
 ### App ###
 data.db
+.env
