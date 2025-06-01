@@ -12,6 +12,7 @@ class AuthController(call: ApplicationCall) : BaseController(call) {
         when (action?.lowercase()) {
             "login" -> login()
             "logout" -> logout()
+            "restricted" -> restricted()
             "authenticate" -> authenticate(params["username"], params["password"])
             "success" -> success()
             else -> null
