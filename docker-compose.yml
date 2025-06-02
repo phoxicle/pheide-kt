@@ -12,4 +12,5 @@ services:
       # override in env file
       - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-pass}
+      - COOKIE_VALUE=${COOKIE_VALUE:-cookie_val}
     restart: unless-stopped

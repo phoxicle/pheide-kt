@@ -8,6 +8,7 @@ object Authenticator {
     private const val COOKIE_NAME = "auth_cookie"
 
     fun authenticate(call: ApplicationCall, username: String, password: String): Boolean {
+        // TODO don't allow default fallbacks here omg danger
         val adminUsername = System.getenv("ADMIN_USERNAME") ?: "admin"
         val adminPassword = System.getenv("ADMIN_PASSWORD") ?: "pass"
         val cookieVal = System.getenv("COOKIE_VALUE") ?: "cookie"
