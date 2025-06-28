@@ -5,10 +5,8 @@ import com.pheide.controller.Authenticator.verifyAccess
 import com.pheide.controller.LinkBuilder.link
 import com.pheide.repository.TabRepository
 import com.pheide.view.View
-import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.*
 import org.slf4j.LoggerFactory
-import java.nio.file.Files.delete
-import kotlin.text.toInt
 
 class TabController(
     call: ApplicationCall,
@@ -112,6 +110,7 @@ class TabController(
             )
         ).renderIf(isLoggedIn(call))
 
+
         respond(renderPage(view, pageId))
     }
 
@@ -124,7 +123,7 @@ class TabController(
     suspend fun delete(pageId: Int, tabId: Int) {
         verifyAccess(call)
         val tabId = tabRepository.delete(tabId)
-        redirect(LinkBuilder.link("tab", "show", mapOf("page_id" to pageId.toString(), "tab_id" to tabId.toString())))
+        redirect(LinkBuilder.link("page", "show", mapOf("page_id" to pageId.toString())))
     }
 
 
