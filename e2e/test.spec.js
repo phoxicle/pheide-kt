@@ -67,7 +67,7 @@ test('general content editing updates tab content', async ({ page }) => {
   expect(updatedContent.trim()).toBe(newContent);
 });
 
-test('can create a new tab', async ({ page }) => {
+test('can create and delete a new tab', async ({ page }) => {
   console.log('Logging in');
   await login(page);
 
@@ -136,4 +136,34 @@ test('can reorder tabs by shifting right', async ({ page }) => {
   const secondTabText = await updatedTabItems[1].innerText();
   expect(newActiveTabText.trim()).toBe(activeTabText.trim());
   expect(secondTabText.trim()).toBe(activeTabText.trim());
+});
+
+test('can create and delete a new page', async ({ page }) => {
+  console.log('Logging in');
+  await login(page);
+
+  console.log('Navigating to main page');
+  await page.goto('http://localhost:8080');
+
+  console.log('Hovering and clicking to create notebook page');
+  await page.hover('#notebook');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#notebook a')
+  ]);
+
+  console.log('Verifying page title is notebook');
+  const pageTitle = await page.locator('#current #pageTitle').innerText();
+  expect(pageTitle.trim()).toBe('notebook');
+
+  console.log('Clicking delete (x) button for notebook page');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#current #page_delete_button')
+  ]);
+
+  console.log('Verifying notebook page was deleted, i.e. link is now a create link');
+  await page.hover('#notebook');
+  const notebookHref = await page.getAttribute('#notebook a', 'href');
+  expect(notebookHref).toContain('controller=page&action=create');
 });
