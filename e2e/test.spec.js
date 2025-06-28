@@ -10,7 +10,8 @@ async function login(page) {
   ]);
 }
 
-test.beforeAll(async ({ browser }) => {
+test.beforeEach(async ({ browser }) => {
+  console.log('Resetting the application state');
   const page = await browser.newPage();
   await login(page);
   await page.goto('http://localhost:8080?controller=admin&action=reset');
@@ -166,4 +167,40 @@ test('can create and delete a new page', async ({ page }) => {
   await page.hover('#notebook');
   const notebookHref = await page.getAttribute('#notebook a', 'href');
   expect(notebookHref).toContain('controller=page&action=create');
+});
+
+test('can set a page as default', async ({ page }) => {
+  console.log('Logging in');
+  await login(page);
+
+  console.log('Navigating to base page');
+  await page.goto('http://localhost:8080');
+  let pageTitle = await page.locator('#current #pageTitle').innerText();
+  expect(pageTitle.trim()).toBe('Home');
+
+  console.log('Navigating to mill page');
+  await page.hover('#mill');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#mill a')
+  ]);
+  pageTitle = await page.locator('#current #pageTitle').innerText();
+  expect(pageTitle.trim()).toBe('Hobby');
+
+  console.log('Double clicking page title to edit');
+  await page.dblclick('#current #pageTitle');
+
+  console.log('Checking the "default?" checkbox');
+  await page.check('#current #pageTitle_edit input[name="is_default"]');
+
+  console.log('Submitting the form to set as default');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#current #pageTitle_edit input[type="submit"]')
+  ]);
+
+  console.log('Navigating to base URL to verify default page');
+  await page.goto('http://localhost:8080');
+  pageTitle = await page.locator('#current #pageTitle').innerText();
+  expect(pageTitle.trim()).toBe('Hobby');
 });
