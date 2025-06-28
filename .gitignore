@@ -47,3 +47,10 @@ bin/
 ### App ###
 data.db
 .env
+
+### Node ###
+node_modules/
+
+### Testing ###
+test-results/
+
