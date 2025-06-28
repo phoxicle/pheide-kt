@@ -59,19 +59,17 @@ A Kotlin web application using Ktor, JetBrains Exposed, and SQLite.
    npx playwright install
    ```
 
-   To run end-to-end tests, use:
-
-   ```sh
-   npm run test:e2e
-   ```
-
-   To run the test env via gradlew:
-
+   Run the test env via gradlew:
    ```
    DB_NAME=test.db ./gradlew run
    ```
 
-   Then authenticate and reset the DB.
+   Then run end-to-end tests:
+   ```sh
+   npm run test:e2e
+   ```
+
+   To manually login and reset the test DB:
    ```
    http://localhost:8080?controller=auth&action=login
    (admin, pass)
