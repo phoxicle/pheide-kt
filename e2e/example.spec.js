@@ -17,3 +17,54 @@ test('homepage has expected title', async ({ page }) => {
   await page.goto('http://localhost:8080');
   await expect(page).toHaveTitle(/Pheide/);
 });
+
+test('general navigation switches tab content', async ({ page }) => {
+  await page.goto('http://localhost:8080');
+
+  console.log('Checking initial tab content');
+  const tabContent1 = await page.locator('#tabContent').innerText();
+  expect(tabContent1.trim()).toBe('Main content 1');
+
+  console.log('Clicking #mill tab link');
+  await page.hover('#mill');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#mill a')
+  ]);
+
+  console.log('Checking tab content after navigation');
+  const tabContent2 = await page.locator('#tabContent').innerText();
+  expect(tabContent2.trim()).toBe('mill tab content 1');
+});
+
+test('general content editing updates tab content', async ({ page }) => {
+  console.log('Logging in');
+  await page.goto('http://localhost:8080?controller=auth&action=login');
+  await page.fill('input[name="username"]', 'admin');
+  await page.fill('input[name="password"]', 'pass');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('input[type="submit"]')
+  ]);
+
+  console.log('Navigating to main page');
+  await page.goto('http://localhost:8080');
+
+  console.log('Filling in new content in textarea');
+  console.log('Double clicking #tabContent to enter edit mode');
+  await page.dblclick('#tabContent');
+
+  console.log('Filling in new content in textarea');
+  const newContent = 'Edited main content!';
+  await page.fill('#tabContent_edit textarea', newContent);
+
+  console.log('Submitting edited content');
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('#tabContent_edit input[type="submit"]')
+  ]);
+
+  console.log('Verifying updated content');
+  const updatedContent = await page.locator('#tabContent').innerText();
+  expect(updatedContent.trim()).toBe(newContent);
+});
