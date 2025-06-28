@@ -4,7 +4,7 @@ import com.pheide.controller.Authenticator
 import com.pheide.controller.ControllerFactory
 import com.pheide.controller.PageController
 import com.pheide.repository.DAL
-import io.ktor.http.*
+import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
@@ -17,15 +17,31 @@ import java.io.File
 val logger = LoggerFactory.getLogger("Main")
 
 fun main() {
-    // Initialize the database connection
-    // TODO check location
-    DAL.connect()
-//    DAL.clearTestData()
-    DAL.createSchemaAndPopulateData()
 
     embeddedServer(Netty, port = 8080) {
         routing {
             staticFiles("/resources", File("public/static"))
+
+            // Support different DB for e2e testing
+            intercept(ApplicationCallPipeline.Plugins) {
+                val isTest = call.request.queryParameters["test"]?.toBoolean() ?: false
+                // TODO this needs to go in own, authenticated action
+                val resetData = call.request.queryParameters["reset_data"]?.toBoolean() ?: false
+                if (isTest) {
+                    logger.info("Running in e2e test mode")
+                    val dbPath = "data-e2e.db"
+                    DAL.connect(dbPath)
+
+                } else {
+                    logger.info("Running in normal mode")
+                    DAL.connect()
+                }
+
+                if (resetData) {
+                    DAL.clearData()
+                    DAL.createSchemaAndPopulateData()
+                }
+            }
 
             get("/") {
                 // TODO look at proper routing

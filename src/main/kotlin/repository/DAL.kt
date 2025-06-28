@@ -1,12 +1,7 @@
 package com.pheide.repository
 
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.deleteAll
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
@@ -14,14 +9,16 @@ val logger = LoggerFactory.getLogger("DAL")
 
 object DAL {
 
-    fun connect() {
+    fun connect(dbPath: String? = "data.db") {
         // Initialize the database connection
-        Database.connect("jdbc:sqlite:data.db", driver = "org.sqlite.JDBC")
+        logger.info("Using DB: $dbPath")
+        Database.connect("jdbc:sqlite:$dbPath", driver = "org.sqlite.JDBC")
     }
 
-    fun clearTestData() {
-        logger.info("Clearing test data")
+    fun clearData() {
+        logger.info("Clearing data")
         transaction {
+            SchemaUtils.create(PageTable, TabTable)
             TabTable.deleteAll()
             PageTable.deleteAll()
         }
