@@ -1,4 +1,3 @@
-
 # pheide-kt
 
 A Kotlin web application using Ktor, JetBrains Exposed, and SQLite.
@@ -49,13 +48,14 @@ A Kotlin web application using Ktor, JetBrains Exposed, and SQLite.
 
    The database schema and test data are created automatically on first run.
 
-5. **e2e tests**
+5. **E2e tests**
 
-    For end-to-end testing, ensure you have Node.js and npm installed. Then, set up Playwright:
+   For end-to-end testing, ensure you have Node.js and npm installed. Then, set up Playwright:
 
    ```
    npm init -y
    npm install -D @playwright/test
+   npm install --save-dev cross-env
    npx playwright install
    ```
 
@@ -65,7 +65,18 @@ A Kotlin web application using Ktor, JetBrains Exposed, and SQLite.
    npm run test:e2e
    ```
 
-   This will execute the tests defined in `src/test/kotlin`.
+   To run the test env via gradlew:
+
+   ```
+   DB_NAME=test.db ./gradlew run
+   ```
+
+   Then authenticate and reset the DB.
+   ```
+   http://localhost:8080?controller=auth&action=login
+   (admin, pass)
+   http://localhost:8080?controller=admin&action=reset
+    ```
 
 ### Project Structure
 

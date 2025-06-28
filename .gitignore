@@ -53,4 +53,5 @@ node_modules/
 
 ### Testing ###
 test-results/
+test.db
 

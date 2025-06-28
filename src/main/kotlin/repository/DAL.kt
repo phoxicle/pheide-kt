@@ -9,8 +9,9 @@ val logger = LoggerFactory.getLogger("DAL")
 
 object DAL {
 
-    fun connect(dbPath: String? = "data.db") {
+    fun connect() {
         // Initialize the database connection
+        val dbPath = System.getenv("DB_NAME") ?: "data.db"
         logger.info("Using DB: $dbPath")
         Database.connect("jdbc:sqlite:$dbPath", driver = "org.sqlite.JDBC")
     }
@@ -18,14 +19,13 @@ object DAL {
     fun clearData() {
         logger.info("Clearing data")
         transaction {
-            SchemaUtils.create(PageTable, TabTable)
             TabTable.deleteAll()
             PageTable.deleteAll()
         }
     }
 
     // Define schema and populate test data
-    fun createSchemaAndPopulateData() {
+    fun createSchemaAndPopulateDataIfNone() {
         logger.info("Creating schema")
         transaction {
             SchemaUtils.create(PageTable, TabTable)
