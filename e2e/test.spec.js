@@ -1,14 +1,18 @@
 const { test, expect } = require('@playwright/test');
 
-test.beforeAll(async ({ browser }) => {
-  const page = await browser.newPage();
-  // Go to login page
+async function login(page) {
   await page.goto('http://localhost:8080?controller=auth&action=login');
-  // Fill in credentials and submit
   await page.fill('input[name="username"]', 'admin');
   await page.fill('input[name="password"]', 'pass');
-  await page.click('input[type="submit"]');
-  // Go to reset URL
+  await Promise.all([
+    page.waitForNavigation(),
+    page.click('input[type="submit"]')
+  ]);
+}
+
+test.beforeAll(async ({ browser }) => {
+  const page = await browser.newPage();
+  await login(page);
   await page.goto('http://localhost:8080?controller=admin&action=reset');
   await page.close();
 });
@@ -39,13 +43,8 @@ test('general navigation switches tab content', async ({ page }) => {
 
 test('general content editing updates tab content', async ({ page }) => {
   console.log('Logging in');
-  await page.goto('http://localhost:8080?controller=auth&action=login');
-  await page.fill('input[name="username"]', 'admin');
-  await page.fill('input[name="password"]', 'pass');
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click('input[type="submit"]')
-  ]);
+  await login(page);
+
   console.log('Navigating to main page');
   await page.goto('http://localhost:8080');
 
@@ -70,15 +69,10 @@ test('general content editing updates tab content', async ({ page }) => {
 
 test('can create a new tab', async ({ page }) => {
   console.log('Logging in');
-    await page.goto('http://localhost:8080?controller=auth&action=login');
-    await page.fill('input[name="username"]', 'admin');
-    await page.fill('input[name="password"]', 'pass');
-    await Promise.all([
-      page.waitForNavigation(),
-      page.click('input[type="submit"]')
-    ]);
-    console.log('Navigating to main page');
-      await page.goto('http://localhost:8080');
+  await login(page);
+
+  console.log('Navigating to main page');
+  await page.goto('http://localhost:8080');
 
   console.log('Clicking "+" to add a new tab');
   await Promise.all([
@@ -93,12 +87,12 @@ test('can create a new tab', async ({ page }) => {
   console.log('Submitting new tab form');
   await Promise.all([
     page.waitForNavigation(),
-        page.click('#cats li.activeTab input[type="submit"]')
+    page.click('#cats li.activeTab input[type="submit"]')
   ]);
 
   console.log('Verifying the active tab is the new one');
-    const activeTabText = await page.locator('#cats li.activeTab #tabTitle').innerText();
-    expect(activeTabText).toContain(newTabTitle);
+  const activeTabText = await page.locator('#cats li.activeTab #tabTitle').innerText();
+  expect(activeTabText).toContain(newTabTitle);
 
   console.log('Clicking the delete (x) button on the new tab');
   await Promise.all([
@@ -113,13 +107,8 @@ test('can create a new tab', async ({ page }) => {
 
 test('can reorder tabs by shifting right', async ({ page }) => {
   console.log('Logging in');
-  await page.goto('http://localhost:8080?controller=auth&action=login');
-  await page.fill('input[name="username"]', 'admin');
-  await page.fill('input[name="password"]', 'pass');
-  await Promise.all([
-    page.waitForNavigation(),
-    page.click('input[type="submit"]')
-  ]);
+  await login(page);
+
   console.log('Navigating to main page');
   await page.goto('http://localhost:8080');
 
