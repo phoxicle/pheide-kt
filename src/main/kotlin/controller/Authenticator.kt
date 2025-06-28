@@ -13,6 +13,7 @@ object Authenticator {
         val adminPassword = System.getenv("ADMIN_PASSWORD") ?: "pass"
         val cookieVal = System.getenv("COOKIE_VALUE") ?: "cookie"
 //        logger.info("Admin username: $adminUsername, password: $adminPassword")
+//        logger.info("Given username: $username, password: $password")
         val isValid = username == adminUsername && password == adminPassword
         if (isValid) {
             setCookie(call, hashValue(cookieVal))
